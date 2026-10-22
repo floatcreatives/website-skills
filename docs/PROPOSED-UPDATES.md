@@ -1,7 +1,7 @@
 # Proposed additions to BROCHURE-SITE-RULES.md
 
-Status: **draft — review before merging.** Produced from a post-mortem of the
-Villa Anemoessa rebuild (Astro 7 + Tailwind v4, single-page villa site, 2026-09).
+Status: **draft — review before merging.** Produced from a post-mortem of a
+recent villa rebuild (Astro 7 + Tailwind v4, single-page villa site, 2026-09).
 Each item names the target section and includes suggested verbatim text.
 
 ---
