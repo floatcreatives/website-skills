@@ -1,0 +1,13 @@
+---
+const { badge, title, description, center } = Astro.props;
+---
+
+<div class={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 ${center ? 'text-center' : ''}`}>
+  {badge && (
+    <span data-motion class="text-brand-600 text-sm font-semibold tracking-wide uppercase mb-4 block">{badge}</span>
+  )}
+  <h2 data-animate class="text-4xl sm:text-5xl font-bold text-neutral-900 leading-tight">{title}</h2>
+  {description && (
+    <p data-animate class="text-lg text-neutral-600 mt-4 max-w-2xl">{description}</p>
+  )}
+</div>

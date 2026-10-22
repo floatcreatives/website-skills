@@ -1,0 +1,25 @@
+---
+export interface Props {
+  variant?: 'subtle' | 'medium' | 'thin';
+  fromColor?: string;
+  to_color?: string;
+  class?: string;
+}
+
+const { variant = 'subtle', from_color = '#ffffff', to_color = '#f9fafb', class: className = '' } = Astro.props;
+
+const heights: Record<string, string> = {
+  subtle: '40',
+  medium: '60',
+  thin: '24'
+};
+
+const height = heights[variant] || heights.subtle;
+---
+
+<div class={`wave-divider ${className}`} aria-hidden="true">
+  <svg viewBox="0 0 1200 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style={`height:${height}px;`}>
+    <path d="M0,20 C150,40 350,0 600,20 C850,40 1050,0 1200,20 L1200,40 L0,40 Z" fill={to_color}></path>
+    <path d="M0,25 C200,10 400,35 600,22 C800,10 1000,35 1200,22 L1200,40 L0,40 Z" fill={to_color} opacity="0.5"></path>
+  </svg>
+</div>

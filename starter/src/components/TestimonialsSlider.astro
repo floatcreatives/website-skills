@@ -1,0 +1,261 @@
+---
+import Icon from './Icon.astro';
+import { testimonials } from '../data/content/testimonials';
+---
+
+<section class="py-20 sm:py-24 bg-neutral-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center max-w-3xl mx-auto mb-12">
+      <span class="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-100 rounded-full text-brand-700 text-sm font-medium mb-6">
+        <span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span>
+        Customer Reviews
+      </span>
+      <h2 class="text-neutral-900 text-4xl sm:text-5xl font-bold mb-4">
+        What Our Customers Say
+      </h2>
+      <p class="text-neutral-600 text-lg">
+        Trusted by customers. Hear what they have to say.
+      </p>
+    </div>
+
+    <!-- Carousel -->
+    <div class="carousel" id="testimonial-carousel">
+      <div class="carousel-track">
+        {testimonials.map((item) => (
+          <div class="carousel-slide">
+            <div class="p-8 bg-white rounded-3xl flex flex-col gap-5 h-full border border-neutral-100">
+              
+              <div class="flex gap-1">
+                {[...Array(item.rating)].map(() => (
+                  <Icon name="star" class="w-5 h-5 text-yellow-400" />
+                ))}
+              </div>
+              
+              <p class="text-neutral-600 leading-relaxed flex-1">"{item.quote}"</p>
+              
+              <div class="flex items-center gap-3 pt-4 border-t border-neutral-100">
+                <img src={item.avatar} alt={item.name} class="w-12 h-12 rounded-full object-cover" loading="lazy" width="48" height="48" />
+                <div>
+                  <p class="text-sm font-semibold text-neutral-900">{item.name}</p>
+                  <p class="text-xs text-neutral-500">{item.role}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex items-center justify-center gap-6 mt-10">
+      <button class="carousel-prev group flex items-center justify-center w-12 h-12 rounded-full border border-neutral-200 hover:border-brand-400 hover:bg-brand-50 transition-all duration-300 hover:scale-110 active:scale-95" aria-label="Previous review">
+        <svg class="w-5 h-5 text-neutral-400 group-hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
+      <div class="w-32 sm:w-48 h-1 bg-neutral-200 rounded-full overflow-hidden">
+        <div class="carousel-progress h-full bg-brand-500 rounded-full transition-all duration-300" style="width: 12.5%"></div>
+      </div>
+
+      <span class="text-sm text-neutral-500 font-medium tabular-nums">
+        <span class="carousel-current text-neutral-900 font-semibold">1</span>
+        <span class="mx-1">/</span>
+        <span class="carousel-total">{testimonials.length}</span>
+      </span>
+
+      <button class="carousel-next group flex items-center justify-center w-12 h-12 rounded-full border border-neutral-200 hover:border-brand-400 hover:bg-brand-50 transition-all duration-300 hover:scale-110 active:scale-95" aria-label="Next review">
+        <svg class="w-5 h-5 text-neutral-400 group-hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Dots Navigation -->
+    <div class="flex justify-center gap-2 mt-6 carousel-dots"></div>
+  </div>
+</section>
+
+<style>
+  .carousel {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    cursor: grab;
+    width: 100%;
+  }
+
+  .carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carousel:active {
+    cursor: grabbing;
+  }
+
+  .carousel-track {
+    display: flex;
+    gap: 24px;
+    padding: 4px 0;
+  }
+
+  .carousel-slide {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    width: 100%;
+  }
+
+  /* Tablet: 2 slides */
+  @media (min-width: 768px) {
+    .carousel-slide {
+      width: calc(50% - 12px);
+    }
+  }
+
+  /* Desktop: 3 slides */
+  @media (min-width: 1024px) {
+    .carousel-slide {
+      width: calc(33.333% - 16px);
+    }
+  }
+
+  .carousel-progress {
+    will-change: width;
+  }
+</style>
+
+<script>
+  (function() {
+    const carousel = document.getElementById('testimonial-carousel');
+    const slides = carousel.querySelectorAll('.carousel-slide');
+    const currentEl = document.querySelector('.carousel-current');
+    const totalEl = document.querySelector('.carousel-total');
+    const progressEl = document.querySelector('.carousel-progress');
+    const prevBtn = document.querySelector('.carousel-prev');
+    const nextBtn = document.querySelector('.carousel-next');
+    const dotsContainer = document.querySelector('.carousel-dots');
+
+    const total = slides.length;
+    let autoplay;
+
+    // Build dots
+    function buildDots() {
+      if (!dotsContainer) return;
+      const maxIndex = getMaxIndex();
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < maxIndex; i++) {
+        const dot = document.createElement('button');
+        dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+        dot.addEventListener('click', () => {
+          stopAutoplay();
+          const slideWidth = getSlideWidth();
+          carousel.scrollTo({ left: i * slideWidth, behavior: 'smooth' });
+          startAutoplay();
+        });
+        dotsContainer.appendChild(dot);
+      }
+    }
+
+    function updateDots() {
+      if (!dotsContainer) return;
+      const dots = dotsContainer.querySelectorAll('.carousel-dot');
+      const slideWidth = getSlideWidth();
+      const current = Math.round(carousel.scrollLeft / slideWidth);
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === current);
+      });
+    }
+
+    function getSlideWidth() {
+      return slides[0].offsetWidth + 24;
+    }
+
+    function getVisibleCount() {
+      if (window.innerWidth >= 1024) return 3;
+      if (window.innerWidth >= 768) return 2;
+      return 1;
+    }
+
+    function getMaxIndex() {
+      return Math.max(1, total - getVisibleCount() + 1);
+    }
+
+    function updateCounter() {
+      const slideWidth = getSlideWidth();
+      const maxIndex = getMaxIndex();
+      const current = Math.round(carousel.scrollLeft / slideWidth) + 1;
+      const clamped = Math.max(1, Math.min(current, maxIndex));
+      const progress = maxIndex > 1 ? ((clamped - 1) / (maxIndex - 1)) * 100 : 100;
+
+      if (currentEl) currentEl.textContent = clamped;
+      if (totalEl) totalEl.textContent = maxIndex;
+      if (progressEl) progressEl.style.width = Math.min(100, Math.max(0, progress)) + '%';
+    }
+
+    function scrollBy(direction) {
+      const slideWidth = getSlideWidth();
+      const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+      let target = carousel.scrollLeft + (direction * slideWidth);
+      target = Math.max(0, Math.min(target, maxScroll));
+      carousel.scrollTo({ left: target, behavior: 'smooth' });
+    }
+
+    function startAutoplay() {
+      clearInterval(autoplay);
+      autoplay = setInterval(() => {
+        const slideWidth = getSlideWidth();
+        const maxIndex = getMaxIndex();
+        const currentPos = Math.round(carousel.scrollLeft / slideWidth) + 1;
+        if (currentPos >= maxIndex) {
+          carousel.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          carousel.scrollTo({ left: carousel.scrollLeft + slideWidth, behavior: 'smooth' });
+        }
+      }, 5000);
+    }
+
+    function stopAutoplay() {
+      clearInterval(autoplay);
+    }
+
+    // Scroll listener
+    carousel.addEventListener('scroll', updateCounter, { passive: true });
+
+    // Touch events
+    carousel.addEventListener('touchstart', stopAutoplay, { passive: true });
+    carousel.addEventListener('touchend', startAutoplay, { passive: true });
+
+    // Mouse events
+    carousel.addEventListener('mouseenter', stopAutoplay);
+    carousel.addEventListener('mouseleave', startAutoplay);
+
+    // Buttons
+    prevBtn?.addEventListener('click', () => {
+      stopAutoplay();
+      scrollBy(-1);
+      startAutoplay();
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      stopAutoplay();
+      scrollBy(1);
+      startAutoplay();
+    });
+
+    // Resize
+    window.addEventListener('resize', () => {
+      updateCounter();
+    });
+
+    // Initial
+    buildDots();
+    updateCounter();
+    startAutoplay();
+    
+    // Update dots on scroll
+    carousel.addEventListener('scroll', updateDots, { passive: true });
+  })();
+</script>

@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+import { SITE } from '../data/site.config';
+---
+
+<Layout
+  title={`Page Not Found${SITE.seo.titleSuffix}`}
+  description={`The page you are looking for could not be found. Visit ${SITE.name} for more information.`}
+  canonical={`${SITE.url}/404.html`}
+  robots="noindex, follow"
+>
+  <Header />
+
+  <section class="py-32 sm:py-40 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div data-motion class="mb-8">
+        <div class="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Icon name="search" class="w-10 h-10 text-brand-600" />
+        </div>
+        <h1 class="text-8xl sm:text-9xl font-black text-neutral-900 leading-none tracking-tighter mb-4">404</h1>
+        <p class="text-2xl sm:text-3xl font-bold text-neutral-900 mb-4">Page not found</p>
+        <p class="text-lg text-neutral-500 max-w-md mx-auto">
+          The page you are looking for does not exist or has been moved.
+        </p>
+      </div>
+
+      <div data-motion class="flex flex-wrap justify-center gap-4">
+        <a href="/" class="inline-flex items-center gap-2 px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-full transition-colors">
+          <Icon name="home" class="w-5 h-5" />
+          Back to Home
+        </a>
+        <a href="/services" class="inline-flex items-center gap-2 px-8 py-4 border border-neutral-200 hover:border-brand-300 text-neutral-700 font-semibold rounded-full transition-colors">
+          <Icon name="star" class="w-5 h-5" />
+          Our Services
+        </a>
+        <a href="/contact" class="inline-flex items-center gap-2 px-8 py-4 border border-neutral-200 hover:border-brand-300 text-neutral-700 font-semibold rounded-full transition-colors">
+          <Icon name="map-pin" class="w-5 h-5" />
+          Contact Us
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Layout>

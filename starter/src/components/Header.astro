@@ -1,0 +1,157 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { SITE } from '../data/site.config';
+const pathname = Astro.url.pathname;
+---
+
+<header id="site-header" class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-neutral-100 z-50 transition-all duration-300 ease-out">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+      <a href="/" class="flex items-center gap-2.5">
+        <Logo id="site-logo" class="h-10 w-auto transition-all duration-300" />
+        <span class="text-xl font-bold text-neutral-900">{SITE.name}</span>
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-6">
+        {SITE.nav.main.map((link) => (
+          <a href={link.href} class="text-sm font-medium text-neutral-600 hover:text-brand-600 transition-colors relative group" aria-current={pathname === `${link.href}/` || pathname === link.href ? "page" : undefined}>
+            {link.label}
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-600 transition-all duration-300 group-hover:w-full"></span>
+          </a>
+        ))}
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <a href={SITE.business.social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Follow us on Facebook" class="hidden sm:inline-flex items-center justify-center w-9 h-9 rounded-full hover:bg-brand-50 text-brand-600 transition-colors hover:scale-110 active:scale-95">
+          <Icon name="facebook" class="w-5 h-5" />
+        </a>
+        <a href={SITE.business.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" class="hidden sm:inline-flex items-center justify-center w-9 h-9 rounded-full hover:bg-brand-50 text-brand-600 transition-colors hover:scale-110 active:scale-95">
+          <Icon name="instagram" class="w-5 h-5" />
+        </a>
+        <a href={`tel:${SITE.business.contact.phone.raw}`} class="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-full transition-colors hover-shimmer active:scale-[0.97]">
+          <Icon name="phone" class="w-4 h-4" />
+          {SITE.business.contact.phone.display}
+        </a>
+        <button id="menu-btn" aria-label="Open navigation menu" class="lg:hidden w-9 h-9 flex items-center justify-center rounded-full hover:bg-neutral-100 transition-colors relative">
+          <svg id="menu-icon" class="w-5 h-5 text-neutral-600 transition-opacity duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <svg id="close-icon" class="w-5 h-5 text-neutral-600 absolute inset-0 m-auto opacity-0 transition-opacity duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Menu -->
+<div id="mobile-menu" class="mobile-menu-overlay lg:hidden fixed top-16 left-0 right-0 bottom-0 bg-white/95 backdrop-blur-md z-40 overflow-y-auto">
+  <div class="flex flex-col items-center justify-center min-h-full gap-6 py-8 px-6">
+    {SITE.nav.main.map((link, i) => (
+      <a href={link.href} class="mobile-menu-link text-xl font-medium text-neutral-800 hover:text-brand-600 transition-colors" style={`transition-delay: ${50 + i * 50}ms`}>{link.label}</a>
+    ))}
+    <a href={`tel:${SITE.business.contact.phone.raw}`} class="mobile-menu-link mt-4 inline-flex items-center gap-2 px-6 py-3 bg-brand-600 text-white text-lg font-semibold rounded-full" style="transition-delay: 350ms;">
+      <Icon name="phone" class="w-5 h-5" />
+      {SITE.business.contact.phone.display}
+    </a>
+  </div>
+</div>
+
+<script>
+  // Sticky header hide/show on scroll + glass morphism intensification + logo shrink
+  let lastScrollY = 0;
+  let ticking = false;
+  const header = document.getElementById('site-header');
+  const logo = document.getElementById('site-logo');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuBtn = document.getElementById('menu-btn');
+  const menuIcon = document.getElementById('menu-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  function updateHeader() {
+    const currentScrollY = window.scrollY;
+    const isMobileMenuOpen = mobileMenu && mobileMenu.classList.contains('open');
+
+    // Always show header when menu is open
+    if (isMobileMenuOpen) {
+      header.style.transform = 'translateY(0)';
+      lastScrollY = currentScrollY;
+      ticking = false;
+      return;
+    }
+
+    // Glass morphism intensification on scroll
+    if (currentScrollY > 20) {
+      header.style.backdropFilter = 'blur(16px)';
+      header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+      header.style.boxShadow = '0 4px 20px -8px rgba(0,0,0,0.08)';
+      if (logo) logo.classList.replace('h-10', 'h-8');
+    } else {
+      header.style.backdropFilter = 'blur(8px)';
+      header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+      header.style.boxShadow = 'none';
+      if (logo) logo.classList.replace('h-8', 'h-10');
+    }
+
+    // Hide on scroll down, show on scroll up
+    if (currentScrollY > lastScrollY && currentScrollY > 80) {
+      header.style.transform = 'translateY(-100%)';
+    } else {
+      header.style.transform = 'translateY(0)';
+    }
+
+    lastScrollY = currentScrollY;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateHeader);
+      ticking = true;
+    }
+  });
+
+  // Mobile menu toggle with animation
+  menuBtn?.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.contains('open');
+    if (!isOpen) {
+      mobileMenu.classList.remove('hidden');
+      // Force reflow before adding open class for animation
+      void mobileMenu.offsetWidth;
+      mobileMenu.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      menuBtn.setAttribute('aria-label', 'Close navigation menu');
+      menuBtn.setAttribute('aria-expanded', 'true');
+      menuIcon?.classList.add('opacity-0');
+      closeIcon?.classList.remove('opacity-0');
+    } else {
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+      menuBtn.setAttribute('aria-label', 'Open navigation menu');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuIcon?.classList.remove('opacity-0');
+      closeIcon?.classList.add('opacity-0');
+      // Hide after animation completes
+      setTimeout(() => {
+        if (!mobileMenu.classList.contains('open')) {
+          mobileMenu.classList.add('hidden');
+        }
+      }, 300);
+    }
+  });
+
+  // Close menu on link click
+  mobileMenu?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+      menuBtn.setAttribute('aria-label', 'Open navigation menu');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuIcon?.classList.remove('opacity-0');
+      closeIcon?.classList.add('opacity-0');
+      setTimeout(() => {
+        if (!mobileMenu.classList.contains('open')) {
+          mobileMenu.classList.add('hidden');
+        }
+      }, 300);
+    });
+  });
+</script>

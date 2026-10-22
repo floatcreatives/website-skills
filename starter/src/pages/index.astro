@@ -1,0 +1,228 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Features from '../components/Features.astro';
+import TestimonialsSlider from '../components/TestimonialsSlider.astro';
+import CTA from '../components/CTA.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+import { SITE, canonicalUrl } from '../data/site.config';
+import { homeContent } from '../data/content/home';
+import { buildSrcset, halfSizes } from '../utils/images';
+
+const { hero, trustBar, servicesIntro, aboutIntro, features, whyChooseUs, serviceAreas, cta } = homeContent;
+---
+
+<Layout
+  title={`Home${SITE.seo.titleSuffix}`}
+  description={SITE.description}
+  canonical={canonicalUrl("/")}
+  ogImage={`${SITE.url}/images/placeholder.svg`}
+>
+  <Header />
+
+  <Hero
+    title={hero.title}
+    subtitle={hero.subtitle}
+    stats={hero.stats}
+    ctaText={`Call ${SITE.business.contact.phone.display}`}
+    ctaLink={`tel:${SITE.business.contact.phone.raw}`}
+    secondaryText="Our Services"
+    secondaryLink="/services"
+    image={SITE.heroImage}
+    altText={`${SITE.name} — ${SITE.tagline} at ${SITE.business.address.street}, ${SITE.business.address.locality}`}
+  />
+
+  <!-- Trust Bar -->
+  <section class="py-16 bg-neutral-900 dark-section-glow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-3 gap-6">
+        {trustBar.items.map((item, i) => (
+          <div data-motion style={`--motion-delay:${i * 100}ms`} class="p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/10 flex items-center gap-4 glass-glow hover-lift cursor-pointer">
+            <div class="w-12 h-12 bg-brand-500/10 rounded-2xl flex items-center justify-center shrink-0 icon-container">
+              <Icon name={item.icon} class="w-6 h-6 text-brand-400" />
+            </div>
+            <div>
+              <p class="text-white font-semibold text-sm">{item.title}</p>
+              <p class="text-white/50 text-xs mt-0.5">
+                {item.description === null
+                  ? `${SITE.business.address.locality}, ${SITE.business.address.countryName}`
+                  : item.description}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Intro -->
+  <section class="py-20 sm:py-24 bg-neutral-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16" data-motion>
+        <span data-motion class="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-100 rounded-full text-brand-700 text-sm font-medium mb-6" style="letter-spacing: -0.01em;">
+          <span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span>
+          {servicesIntro.badge}
+        </span>
+        <h2 data-animate class="text-neutral-900 text-4xl sm:text-5xl font-bold mb-6">
+          {servicesIntro.heading}
+        </h2>
+        <p data-animate class="text-neutral-600 text-lg">
+          {servicesIntro.description}
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        {servicesIntro.cards.map((card, i) => (
+          <div data-motion style={`--motion-delay:${i * 100}ms`} class={`p-8 ${card.highlighted ? 'bg-brand-600' : 'bg-white group hover:bg-brand-600'} rounded-3xl text-center transition-all duration-500 cursor-pointer hover-lift hover-border-draw`}>
+            <div data-motion class={`w-16 h-16 ${card.highlighted ? 'bg-white/20' : 'bg-brand-100 group-hover:bg-white/20'} rounded-2xl flex items-center justify-center mb-6 mx-auto transition-all duration-500 icon-container`} style={card.highlighted ? 'background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));' : ''}>
+              <Icon name={card.icon} class={`w-8 h-8 ${card.highlighted ? 'text-white' : 'text-brand-600 group-hover:text-white'} transition-all duration-500`} />
+            </div>
+            <h3 class={`${card.highlighted ? 'text-white' : 'text-neutral-900 group-hover:text-white'} text-xl font-semibold mb-3 transition-all duration-500`}>{card.title}</h3>
+            <p class={`${card.highlighted ? 'text-brand-100' : 'text-neutral-600 group-hover:text-brand-100'} text-base mb-6 transition-all duration-500`}>
+              {card.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- About Intro -->
+  <section class="py-20 bg-neutral-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div data-motion>
+          <span class="text-brand-600 text-sm font-semibold tracking-wide uppercase mb-4 block" style="letter-spacing: -0.01em;">{aboutIntro.badge}</span>
+          <h2 class="text-4xl sm:text-5xl font-bold text-neutral-900 leading-tight mb-6">
+            <span data-animate>{aboutIntro.heading}</span>
+          </h2>
+          {aboutIntro.paragraphs.map((p) => (
+            <p data-animate class="text-lg text-neutral-600 mb-6">{p}</p>
+          ))}
+          <div data-motion class="flex flex-wrap gap-4">
+            <a href={aboutIntro.ctaLink} class="hover-shimmer inline-flex items-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-full transition-colors active:scale-[0.97]">
+              {aboutIntro.ctaText}
+              <Icon name="arrow-right" class="w-4 h-4" />
+            </a>
+            <a href={aboutIntro.secondaryCtaLink} class="hover-shimmer inline-flex items-center gap-2 px-6 py-3 border-2 border-brand-600 text-brand-600 font-semibold rounded-full hover:bg-brand-50 transition-colors active:scale-[0.97]">
+              {aboutIntro.secondaryCtaText}
+            </a>
+          </div>
+        </div>
+        <div data-motion class="rounded-3xl overflow-hidden hover-lift">
+          <img src={aboutIntro.image} alt={aboutIntro.alt} class="w-full h-[500px] object-cover" loading="lazy" decoding="async" srcset={buildSrcset(aboutIntro.image)} sizes={halfSizes} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Features
+    badge={features.badge}
+    heading={features.heading}
+    items={features.items}
+  />
+
+  <TestimonialsSlider />
+
+  <!-- Why Choose Us -->
+  <section class="py-20 sm:py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div data-motion class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-brand-600 text-sm font-semibold tracking-wide uppercase mb-4 block" style="letter-spacing: -0.01em;">{whyChooseUs.badge}</span>
+        <h2 class="text-4xl sm:text-5xl font-bold text-neutral-900 leading-tight" data-animate>{whyChooseUs.heading}</h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {whyChooseUs.items.map((item, i) => (
+          <div data-motion style={`--motion-delay:${i * 100}ms`} class="p-6 bg-neutral-50 rounded-3xl hover-lift hover-border-draw cursor-pointer">
+            <div class="w-12 h-12 bg-brand-100 rounded-2xl flex items-center justify-center mb-4 icon-container" style={`animation: pulse-ring 2s ease-out infinite ${i * 0.3}s;`}>
+              <Icon name={item.icon} class="w-6 h-6 text-brand-600" />
+            </div>
+            <h3 class="text-lg font-bold text-neutral-900 mb-2">{item.title}</h3>
+            <p class="text-neutral-600 text-sm">{item.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Service Areas Map -->
+  <section class="py-20 bg-neutral-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div data-motion class="text-center max-w-3xl mx-auto mb-12">
+        <span class="text-brand-600 text-sm font-semibold tracking-wide uppercase mb-4 block" style="letter-spacing: -0.01em;">{serviceAreas.badge}</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 leading-tight" data-animate>{serviceAreas.heading}</h2>
+        <p data-animate class="text-neutral-600 text-lg mt-4">{serviceAreas.description}</p>
+      </div>
+      <div data-motion class="rounded-3xl overflow-hidden border border-neutral-200 shadow-lg hover-lift">
+        <iframe
+          src={SITE.maps.openStreetMap}
+          width="100%"
+          height="450"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          title={`Map showing ${SITE.name} service areas`}
+        ></iframe>
+      </div>
+      <div data-motion class="flex flex-wrap justify-center gap-3 mt-8">
+        {SITE.business.serviceAreas.map((area, i) => (
+          <span class="tag-pill px-4 py-2 bg-white rounded-full text-neutral-700 text-sm font-medium shadow-sm flex items-center gap-2">
+            <span class={`w-2 h-2 bg-brand-${500 - i * 100} rounded-full`}></span>
+            {area}
+          </span>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CTA
+    badge={cta.badge}
+    title={cta.title}
+    description={cta.description}
+    buttonText={`Call ${SITE.business.contact.phone.display}`}
+    buttonLink={`tel:${SITE.business.contact.phone.raw}`}
+    image="/images/placeholder.svg"
+    altText={`Contact ${SITE.name} — ${SITE.business.address.street}, ${SITE.business.address.locality}`}
+  />
+
+  <Footer />
+</Layout>
+
+<script>
+  function animateCounters() {
+    const counters = document.querySelectorAll('[data-counter]');
+    if (!counters.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.getAttribute('data-counter'), 10);
+          const suffix = el.getAttribute('data-suffix') || '';
+          const prefix = el.getAttribute('data-prefix') || '';
+          const duration = 1500;
+          const start = performance.now();
+
+          function update(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(eased * target);
+            el.textContent = prefix + current + suffix;
+            if (progress < 1) requestAnimationFrame(update);
+          }
+
+          requestAnimationFrame(update);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(c => observer.observe(c));
+  }
+
+  document.addEventListener('DOMContentLoaded', animateCounters);
+</script>

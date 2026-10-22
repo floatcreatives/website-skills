@@ -1,0 +1,60 @@
+---
+import { Icon as AstroIcon } from 'astro-icon/components';
+
+export interface Props {
+  name: string;
+  class?: string;
+}
+
+const { name, class: className = "w-5 h-5" } = Astro.props;
+
+const iconMap: Record<string, string> = {
+  'map': 'lucide:map',
+  'map-pin': 'lucide:map-pin',
+  'truck': 'lucide:truck',
+  'package': 'lucide:package',
+  'clock': 'lucide:clock',
+  'calendar': 'lucide:calendar',
+  'star': 'lucide:star',
+  'shield-check': 'lucide:shield-check',
+  'check': 'lucide:check',
+  'users': 'lucide:users',
+  'phone': 'lucide:phone',
+  'whatsapp': 'lucide:message-circle',
+  'mail': 'lucide:mail',
+  'location': 'lucide:map-pin',
+  'arrow-right': 'lucide:arrow-right',
+  'chevron-down': 'lucide:chevron-down',
+  'menu': 'lucide:menu',
+  'heart': 'lucide:heart',
+  'eye': 'lucide:eye',
+  'sparkles': 'lucide:sparkles',
+  'sun': 'lucide:sun',
+  'gift': 'lucide:gift',
+  'home': 'lucide:home',
+  'building': 'lucide:building',
+  'store': 'lucide:store',
+  'chart': 'lucide:bar-chart',
+  'trending-up': 'lucide:trending-up',
+  'badge-check': 'lucide:badge-check',
+  'leaf': 'lucide:leaf',
+  'refresh': 'lucide:refresh-cw',
+  'zap': 'lucide:zap',
+  'globe': 'lucide:globe',
+  'clipboard': 'lucide:clipboard',
+  'search': 'lucide:search',
+  'info': 'lucide:info',
+  'help-circle': 'lucide:help-circle',
+  'truck-delivery': 'lucide:truck',
+  'handshake': 'lucide:handshake',
+  'instagram': 'lucide:instagram',
+  'facebook': 'lucide:facebook',
+  'close': 'lucide:x',
+  'x': 'lucide:x',
+  'menu-open': 'lucide:x',
+};
+
+const iconName = iconMap[name] || 'lucide:help-circle';
+---
+
+<AstroIcon name={iconName} class={className} />

@@ -1,0 +1,84 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import CTA from '../components/CTA.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import DeliveryAreasSlider from '../components/DeliveryAreasSlider.astro';
+import { SITE, canonicalUrl } from '../data/site.config';
+import { aboutContent } from '../data/content/about';
+import { buildSrcset, heroSizes, halfSizes } from '../utils/images';
+
+const { hero, story, cta } = aboutContent;
+---
+
+<Layout
+  title={`About Us${SITE.seo.titleSuffix}`}
+  description={`Learn about ${SITE.name}. ${SITE.description}`}
+  canonical={canonicalUrl("/about/")}
+  ogImage={`${SITE.url}/images/placeholder.svg`}
+>
+  <Header />
+  <Breadcrumbs items={[{name: "Home", url: "/"}, {name: "About", url: "/about"}]} />
+
+  <section class="relative min-h-[60vh] flex items-center bg-neutral-900 hero-noise hero-vignette">
+    <div class="absolute inset-0 overflow-hidden">
+      <img src="/images/placeholder.svg" srcset={buildSrcset("/images/placeholder.svg")} sizes={heroSizes} alt={`About ${SITE.name}`} class="parallax-bg w-full h-full object-cover opacity-40 scale-110 will-change-transform">
+    </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <span data-motion class="inline-block text-brand-400 text-sm font-semibold tracking-widest uppercase mb-6" style="letter-spacing: -0.01em;">{hero.badge}</span>
+      <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-none tracking-tight mb-6">
+        {hero.headingParts.map((part, i) => (
+          <span data-animate class={part === hero.highlightedHeadingPart ? 'text-brand-400' : ''}>{i > 0 ? <br/> : ''}{part}</span>
+        ))}
+      </h1>
+      <p data-animate class="text-xl text-white/80 max-w-2xl leading-relaxed">
+        {hero.tagline}
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 sm:py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div data-motion class="rounded-3xl overflow-hidden hover-lift">
+          <img src={story.image} alt={story.alt} class="w-full h-[500px] object-cover" loading="lazy" decoding="async" srcset={buildSrcset(story.image)} sizes={halfSizes} />
+        </div>
+        <div data-motion>
+          <span class="text-brand-600 text-sm font-semibold tracking-wide uppercase mb-4 block" style="letter-spacing: -0.01em;">{story.badge}</span>
+          <h2 class="text-4xl sm:text-5xl font-bold text-neutral-900 leading-tight mb-6">
+            <span data-animate>{story.heading}</span>
+          </h2>
+          {story.paragraphs.map((p) => (
+            <p data-animate class="text-lg text-neutral-600 mb-6">{p}</p>
+          ))}
+          <p data-animate class="text-lg text-neutral-600 mb-8">
+            Established in {SITE.business.yearEstablished}, we've been serving
+            {SITE.business.address.locality} for {new Date().getFullYear() - SITE.business.yearEstablished} years.
+          </p>
+          <div data-motion>
+            <a href={story.ctaLink} class="hover-shimmer inline-flex items-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-full transition-colors active:scale-[0.97]">
+              {story.ctaText}
+              <Icon name="arrow-right" class="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <DeliveryAreasSlider />
+
+  <CTA
+    badge={cta.badge}
+    title={cta.title}
+    description={cta.description}
+    buttonText={`Call ${SITE.business.contact.phone.display}`}
+    buttonLink={`tel:${SITE.business.contact.phone.raw}`}
+    image="/images/placeholder.svg"
+    altText={`Learn more about ${SITE.name} — call us today`}
+  />
+
+  <Footer />
+</Layout>

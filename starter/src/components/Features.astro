@@ -1,0 +1,32 @@
+---
+import Icon from './Icon.astro';
+
+const { badge, heading, items } = Astro.props;
+---
+
+<section class="py-20 sm:py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      {badge && (
+        <span data-motion class="text-brand-600 text-sm font-semibold tracking-wide uppercase mb-4 block" style="letter-spacing: -0.01em;">
+          {badge}
+        </span>
+      )}
+      <h2 data-animate class="text-4xl sm:text-5xl font-bold text-neutral-900 leading-tight">
+        {heading}
+      </h2>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {items.map((item: any, i: number) => (
+        <div data-motion style={`--motion-delay:${i * 100}ms`} class="p-8 bg-neutral-50 rounded-3xl flex flex-col gap-5 group hover:bg-brand-50 transition-all duration-300 hover-lift hover-border-draw cursor-pointer">
+          <div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300 icon-container shadow-sm group-hover:shadow-md">
+            <Icon name={item.icon} class="w-7 h-7 text-brand-600" />
+          </div>
+          <h3 class="text-xl font-bold text-neutral-900">{item.title}</h3>
+          <p class="text-neutral-600 leading-relaxed">{item.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

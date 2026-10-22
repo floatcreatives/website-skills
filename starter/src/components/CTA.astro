@@ -1,0 +1,111 @@
+---
+import Icon from './Icon.astro';
+import { SITE } from '../data/site.config';
+import { buildSrcset, heroSizes } from '../utils/images';
+
+const { badge, title, description, buttonText, buttonLink, dark, image, altText } = Astro.props;
+
+const ctaSrcset = image ? buildSrcset(image) : '';
+const ctaAlt = altText || `${SITE.name} — contact us at ${SITE.business.address.street}, ${SITE.business.address.locality}`;
+---
+
+<section class={`py-20 sm:py-24 ${image ? 'bg-white' : (dark ? 'bg-neutral-900' : 'bg-brand-600')}`}>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {image ? (
+      
+      <div class="relative rounded-3xl overflow-hidden min-h-[500px] hero-noise" data-motion="image">
+        <img
+          src={image}
+          srcset={ctaSrcset}
+          sizes={heroSizes}
+          alt={ctaAlt}
+          class="parallax-bg absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
+          loading="lazy"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/70 to-neutral-900/40"></div>
+        
+        
+        <div class="relative z-10 h-full flex flex-col justify-end p-8 sm:p-12 lg:p-16">
+          <div class="max-w-3xl" data-motion>
+            {badge && (
+              <span data-motion class="inline-flex items-center gap-2 px-4 py-1.5 bg-brand-500/30 rounded-full text-brand-400 text-sm font-medium mb-6">
+                <span class="w-1.5 h-1.5 bg-brand-400 rounded-full"></span>
+                {badge}
+              </span>
+            )}
+            <h2 data-animate class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
+              {title}
+            </h2>
+            {description && (
+              <p data-animate class="text-neutral-300 text-lg max-w-2xl">
+                {description}
+              </p>
+            )}
+            <div class="flex flex-wrap gap-4 mt-10">
+              <a href={`tel:${SITE.business.contact.phone.raw}`} data-motion class="hover-shimmer active:scale-[0.97] px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-full transition-all inline-flex items-center gap-2 hover:shadow-lg hover:shadow-brand-600/30">
+                <Icon name="phone" class="w-5 h-5" />
+                Call Us
+              </a>
+              <a href={SITE.business.contact.whatsappUrl} data-motion class="hover-shimmer active:scale-[0.97] inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold rounded-full transition-all">
+                <Icon name="whatsapp" class="w-5 h-5" />
+                WhatsApp
+              </a>
+              <a href={SITE.business.social.facebook} target="_blank" rel="noopener noreferrer" data-motion class="hover-shimmer active:scale-[0.97] inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold rounded-full transition-all">
+                <Icon name="facebook" class="w-5 h-5" />
+                Facebook
+              </a>
+              <a href={SITE.business.social.instagram} target="_blank" rel="noopener noreferrer" data-motion class="hover-shimmer active:scale-[0.97] inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold rounded-full transition-all">
+                <Icon name="instagram" class="w-5 h-5" />
+                Instagram
+              </a>
+            </div>
+          </div>
+          
+          
+          <div class="mt-12 p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 max-w-2xl">
+            <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+              <div data-motion>
+                <span class="text-white/60 text-xs sm:text-sm">Years Experience</span>
+                <p class="text-white font-semibold text-base sm:text-lg">20+ Years</p>
+              </div>
+              <div class="w-px h-10 bg-white/20 hidden sm:block"></div>
+              <div data-motion>
+                <span class="text-white/60 text-xs sm:text-sm">Availability</span>
+                <p class="text-white font-semibold text-base sm:text-lg">24/7 Always Open</p>
+              </div>
+              <div class="w-px h-10 bg-white/20 hidden sm:block"></div>
+              <div data-motion>
+                <span class="text-white/60 text-xs sm:text-sm">Quality</span>
+                <p class="text-white font-semibold text-base sm:text-lg">100% Local & Fresh</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ) : (
+      
+      <div class="max-w-3xl mx-auto text-center">
+        {badge && (
+          <span data-motion class={`text-sm font-semibold tracking-wide uppercase mb-4 block ${dark ? 'text-brand-400' : 'text-brand-100'}`}>
+            {badge}
+          </span>
+        )}
+        <h2 data-animate class="text-4xl sm:text-5xl font-bold leading-tight mb-6 text-white">
+          {title}
+        </h2>
+        {description && (
+          <p data-animate class={`text-lg mb-8 ${dark ? 'text-neutral-300' : 'text-brand-100'}`}>
+            {description}
+          </p>
+        )}
+        <div data-motion>
+          <a href={buttonLink}
+             class="group inline-flex items-center gap-2 px-8 py-4 font-semibold rounded-full text-base transition-colors bg-white hover:bg-neutral-100 text-brand-700">
+            {buttonText}
+            <Icon name="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </a>
+        </div>
+      </div>
+    )}
+  </div>
+</section>

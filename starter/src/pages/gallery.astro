@@ -1,0 +1,84 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import CTA from '../components/CTA.astro';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Lightbox from '../components/Lightbox.astro';
+import { SITE, canonicalUrl } from '../data/site.config';
+import { galleryImages as images, galleryPageContent } from '../data/content/gallery';
+import { buildSrcset, heroSizes, thirdSizes, halfSizes } from '../utils/images';
+
+const { badge, heading, description, cta } = galleryPageContent;
+---
+
+<Layout
+  title={`Gallery${SITE.seo.titleSuffix}`}
+  description={`Photos of ${SITE.name}: our work, our team, and what we deliver every day.`}
+  canonical={canonicalUrl("/gallery/")}
+>
+  <Header />
+  <Breadcrumbs items={[{name: "Home", url: "/"}, {name: "Gallery", url: "/gallery"}]} />
+
+  <section class="py-20 sm:py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mb-12 sm:mb-16">
+        <span data-motion style="letter-spacing: -0.01em;" class="text-brand-600 text-sm font-semibold tracking-wide uppercase mb-4 block">{badge}</span>
+        <h1 data-animate class="text-4xl sm:text-5xl font-bold text-neutral-900 leading-tight">{heading}</h1>
+        <p data-animate class="text-lg text-neutral-600 mt-4">{description.replace('{name}', SITE.name)}</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-3 sm:mb-4" id="gallery-grid">
+        <div data-motion style="--motion-delay:0ms" class="js-gallery-item tilt-card hover-lift group relative rounded-3xl overflow-hidden aspect-[4/5] sm:aspect-[3/4] md:aspect-auto cursor-pointer transition-transform duration-300">
+          <img
+            src={images[0].src}
+            alt={images[0].alt}
+            data-index="0"
+            class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="eager"
+            decoding="async"
+            srcset={buildSrcset(images[0].src)}
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none"></div>
+          <div class="magnify-ring absolute bottom-4 right-4 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg pointer-events-none">
+            <svg class="w-5 h-5 text-neutral-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 sm:gap-4">
+          {images.slice(1, 5).map((img, i) => (
+            <div data-motion style={`--motion-delay:${(i + 1) * 80}ms`} class="js-gallery-item tilt-card hover-lift group relative rounded-3xl overflow-hidden aspect-square cursor-pointer transition-transform duration-300">
+              <img
+                src={img.src}
+                alt={img.alt}
+                data-index={i + 1}
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+                decoding="async"
+                srcset={buildSrcset(img.src)}
+                sizes={thirdSizes}
+              />
+              <div class="magnify-ring absolute bottom-3 right-3 w-9 h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg pointer-events-none">
+                <svg class="w-4 h-4 text-neutral-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTA
+    badge={cta.badge}
+    title={cta.title}
+    description={cta.description}
+    buttonText={`Call ${SITE.business.contact.phone.display}`}
+    buttonLink={`tel:${SITE.business.contact.phone.raw}`}
+    image="/images/placeholder.svg"
+    altText={`${SITE.name} — call us to learn more`}
+  />
+
+  <Lightbox images={images} />
+
+  <Footer />
+</Layout>

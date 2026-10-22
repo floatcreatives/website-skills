@@ -1,0 +1,93 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import CTA from '../components/CTA.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { SITE, canonicalUrl } from '../data/site.config';
+import { services, servicesPageContent } from '../data/content/services';
+import { buildSrcset, heroSizes, halfSizes } from '../utils/images';
+
+const { hero, cta } = servicesPageContent;
+---
+
+<Layout
+  title={`Our Services${SITE.seo.titleSuffix}`}
+  description={servicesPageContent.description}
+  canonical={canonicalUrl("/services/")}
+  ogImage={`${SITE.url}/images/placeholder.svg`}
+>
+  <Header />
+  <Breadcrumbs items={[{name: "Home", url: "/"}, {name: "Services", url: "/services"}]} />
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": services.map(cat => ({
+      "@type": "ListItem",
+      "position": cat.position,
+      "name": cat.name,
+      "description": cat.description,
+    }))
+  })}></script>
+
+  <section class="relative min-h-[60vh] flex items-center bg-neutral-900 hero-noise hero-vignette">
+    <div class="absolute inset-0 overflow-hidden">
+      <img src="/images/placeholder.svg" srcset={buildSrcset("/images/placeholder.svg")} sizes={heroSizes} alt="Our services" class="parallax-bg w-full h-full object-cover opacity-40 scale-110 will-change-transform">
+    </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <span data-motion class="inline-block text-brand-400 text-sm font-semibold tracking-widest uppercase mb-6" style="letter-spacing: -0.01em;">{hero.badge}</span>
+      <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-none tracking-tight mb-6">
+        {hero.headingParts.map((part, i) => (
+          <span data-animate class={part === hero.highlightedHeadingPart ? 'text-brand-400' : ''}>{i > 0 ? <br/> : ''}{part}</span>
+        ))}
+      </h1>
+      <p data-animate class="text-xl text-white/80 max-w-2xl leading-relaxed">
+        {hero.subtitle}
+      </p>
+    </div>
+  </section>
+
+  {services.map((cat, i) => (
+    <section class={`py-20 sm:py-24 ${i % 2 === 0 ? 'bg-white' : 'bg-neutral-50'}`}>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div data-motion class={i % 2 === 1 ? 'lg:order-2' : ''}>
+            <span class="text-brand-600 text-sm font-semibold tracking-wide uppercase mb-4 block" style="letter-spacing: -0.01em;">Category {cat.position}</span>
+            <h2 class="text-4xl sm:text-5xl font-bold text-neutral-900 leading-tight mb-6">
+              <span data-animate>{cat.name}</span>
+            </h2>
+            <p data-animate class="text-lg text-neutral-600 mb-6">
+              {cat.description}
+            </p>
+            <p data-animate class="text-lg text-neutral-600 mb-8">
+              {cat.detail}
+            </p>
+            <div data-motion>
+              <a href="/contact" class="hover-shimmer inline-flex items-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-full transition-colors active:scale-[0.97]">
+                Inquire Now
+                <Icon name="arrow-right" class="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+          <div data-motion class={`rounded-3xl overflow-hidden hover-lift ${i % 2 === 1 ? 'lg:order-1' : ''}`}>
+            <img src={cat.image} alt={`${cat.name} — ${SITE.name}`} class="w-full h-[400px] object-cover" loading="lazy" decoding="async" srcset={buildSrcset(cat.image)} sizes={halfSizes} />
+          </div>
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <CTA
+    badge={cta.badge}
+    title={cta.title}
+    description={cta.description}
+    buttonText={`Call ${SITE.business.contact.phone.display}`}
+    buttonLink={`tel:${SITE.business.contact.phone.raw}`}
+    image="/images/placeholder.svg"
+    altText={`${SITE.name} services — contact us at ${SITE.business.address.street}`}
+  />
+
+  <Footer />
+</Layout>

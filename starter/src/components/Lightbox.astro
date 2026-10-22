@@ -1,0 +1,53 @@
+---
+export interface Props {
+  images: { src: string; alt: string }[];
+}
+const { images } = Astro.props;
+---
+
+<!-- Lightbox Overlay -->
+<div id="lightbox" class="lightbox-overlay fixed inset-0 z-50 bg-neutral-950/95 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Image gallery lightbox">
+  <!-- Close button -->
+  <button id="lb-close" class="absolute top-4 right-4 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-110 active:scale-95" aria-label="Close lightbox">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+  </button>
+
+  <!-- Counter -->
+  <div id="lb-counter" class="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium backdrop-blur-md">
+    1 / {images.length}
+  </div>
+
+  <!-- Caption -->
+  <div id="lb-caption" class="lightbox-caption absolute bottom-24 left-1/2 -translate-x-1/2 z-10 max-w-2xl px-6 py-3 rounded-2xl bg-black/40 backdrop-blur-md text-white text-sm text-center">
+    Image caption
+  </div>
+
+  <!-- Prev button -->
+  <button id="lb-prev" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-110 active:scale-95" aria-label="Previous image">
+    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+  </button>
+
+  <!-- Next button -->
+  <button id="lb-next" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-110 active:scale-95" aria-label="Next image">
+    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+  </button>
+
+  <!-- Image container -->
+  <div class="absolute inset-0 flex items-center justify-center p-4 sm:p-12 md:p-20">
+    <img id="lb-img" src="" alt="" class="lightbox-image max-w-full max-h-full object-contain rounded-3xl shadow-2xl" />
+  </div>
+
+  <!-- Thumbnail strip -->
+  <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 max-w-[90vw] overflow-x-auto px-2 py-2 rounded-2xl bg-white/5 scrollbar-hide">
+    {images.map((img, i) => (
+      <button class="lb-thumb w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden flex-shrink-0 border-2 border-transparent hover:border-white/50 transition-all hover:scale-105" data-index={i} aria-label={`Go to image ${i + 1}`}>
+        <img src={img.src} alt="" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+      </button>
+    ))}
+  </div>
+</div>
+
+<style>
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+</style>

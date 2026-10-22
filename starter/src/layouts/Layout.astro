@@ -1,0 +1,224 @@
+---
+import '../styles/global.css';
+import { SITE, generateBusinessSchema, generateWebsiteSchema } from '../data/site.config';
+
+export interface Props {
+  title: string;
+  description?: string;
+  canonical?: string;
+  ogImage?: string;
+  robots?: string;
+}
+
+const { title, description, canonical, ogImage, robots } = Astro.props;
+const imageUrl = ogImage || SITE.seo.defaultOGImage;
+const robotsMeta = robots || "index, follow";
+const isHomepage = canonical === `${SITE.url}/`;
+
+const businessSchema = generateBusinessSchema();
+const websiteSchema = generateWebsiteSchema();
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content={SITE.seo.themeColor}>
+  <title>{title}</title>
+  {description && <meta name="description" content={description}>}
+  <meta name="robots" content={robotsMeta}>
+  <meta name="author" content={SITE.seo.author}>
+  {canonical && <link rel="canonical" href={canonical}>}
+  {isHomepage && <meta name="google-site-verification" content={SITE.googleVerification}>}
+  {isHomepage && <link rel="preload" as="image" href={SITE.heroImage} type="image/webp" fetchpriority="high">}
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="business.business">
+  <meta property="og:title" content={title}>
+  {description && <meta property="og:description" content={description}>}
+  {canonical && <meta property="og:url" content={canonical}>}
+  <meta property="og:image" content={imageUrl}>
+  <meta property="og:image:alt" content={SITE.seo.ogImageAlt}>
+  <meta property="og:image:width" content={SITE.seo.ogImageWidth}>
+  <meta property="og:image:height" content={SITE.seo.ogImageHeight}>
+  <meta property="og:locale" content={SITE.locale}>
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content={SITE.business.social.twitter}>
+  <meta name="twitter:creator" content={SITE.business.social.twitter}>
+  <meta name="twitter:title" content={title}>
+  {description && <meta name="twitter:description" content={description}>}
+  <meta name="twitter:image" content={imageUrl}>
+
+  <!-- Hreflang alternates -->
+  {canonical && <link rel="alternate" href={canonical} hreflang="en">}
+  {canonical && <link rel="alternate" href={canonical} hreflang="el">}
+  {canonical && <link rel="alternate" href={canonical} hreflang="x-default">}
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json" set:html={JSON.stringify(businessSchema)}></script>
+  <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)}></script>
+  
+  <link rel="icon" type="image/svg+xml" href={SITE.logoPath}>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Preload self-hosted Inter fonts (critical for FCP/LCP) -->
+  <link rel="preload" as="font" href="/fonts/inter-400-latin.woff2" type="font/woff2" crossorigin>
+  <link rel="preload" as="font" href="/fonts/inter-500-latin.woff2" type="font/woff2" crossorigin>
+  <link rel="preload" as="font" href="/fonts/inter-600-latin.woff2" type="font/woff2" crossorigin>
+  <link rel="preload" as="font" href="/fonts/inter-700-latin.woff2" type="font/woff2" crossorigin>
+  <link rel="preload" as="font" href="/fonts/inter-400-greek.woff2" type="font/woff2" crossorigin>
+</head>
+<body class="bg-white">
+  <!-- Skip to content -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-brand-600 focus:text-white focus:rounded-full focus:font-semibold focus:outline-none">Skip to main content</a>
+  
+  <!-- Scroll Progress Bar -->
+  <div id="scroll-progress" class="scroll-progress" style="width:0%"></div>
+  
+  <main id="main-content">
+    <slot />
+  </main>
+  
+  <!-- Back to Top Button -->
+  <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+  </button>
+
+  <script>
+    function observeMotions() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const delay = entry.target.getAttribute('data-motion-delay');
+            if (delay) {
+              entry.target.style.setProperty('--motion-delay', delay + 'ms');
+            }
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('[data-motion], [data-animate]').forEach(el => observer.observe(el));
+    }
+
+    // Smooth scroll for anchor links (accounting for fixed header)
+    function initSmoothAnchors() {
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          const href = this.getAttribute('href');
+          if (!href || href === '#') return;
+          const target = document.querySelector(href);
+          if (target) {
+            e.preventDefault();
+            const headerOffset = 80;
+            const elementPosition = target.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.scrollY - headerOffset;
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+    }
+
+    // Parallax effect on hero background images + ken-burns
+    function initParallax() {
+      const parallaxImages = document.querySelectorAll('.parallax-bg');
+      if (!parallaxImages.length) return;
+      let ticking = false;
+      function updateParallax() {
+        const scrollY = window.scrollY;
+        parallaxImages.forEach(img => {
+          const rect = img.parentElement.getBoundingClientRect();
+          if (rect.bottom > 0 && rect.top < window.innerHeight) {
+            const speed = 0.15;
+            const offset = (rect.top * speed);
+            const isInView = rect.top < window.innerHeight && rect.bottom > 0;
+            // Only apply ken-burns to the first (hero) image
+            const isHero = img.closest('section')?.classList.contains('min-h-screen');
+            if (isHero && isInView) {
+              img.style.transform = `translate3d(0, ${offset}px, 0) scale(1.1)`;
+            } else {
+              img.style.transform = `translate3d(0, ${offset}px, 0) scale(1.1)`;
+            }
+          }
+        });
+        ticking = false;
+      }
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(updateParallax);
+          ticking = true;
+        }
+      });
+      updateParallax();
+    }
+
+    // Scroll progress bar + back-to-top button
+    function initScrollUI() {
+      const progressBar = document.getElementById('scroll-progress');
+      const backToTop = document.getElementById('back-to-top');
+      let ticking = false;
+
+      function update() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        if (progressBar) progressBar.style.width = scrollPercent + '%';
+
+        if (backToTop) {
+          if (scrollTop > 600) {
+            backToTop.classList.add('visible');
+          } else {
+            backToTop.classList.remove('visible');
+          }
+        }
+        ticking = false;
+      }
+
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(update);
+          ticking = true;
+        }
+      });
+
+      if (backToTop) {
+        backToTop.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      update();
+    }
+
+    // Image fade-in on load (skeleton loading effect)
+    function initImageFadeIn() {
+      const images = document.querySelectorAll('img[loading="lazy"], img[data-fade]');
+      images.forEach(img => {
+        if (img.complete) return;
+        img.style.opacity = '0';
+        img.style.transition = 'opacity 0.6s ease';
+        img.addEventListener('load', () => {
+          img.style.opacity = '';
+        });
+        img.addEventListener('error', () => {
+          img.style.opacity = '';
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      observeMotions();
+      initSmoothAnchors();
+      initParallax();
+      initScrollUI();
+      initImageFadeIn();
+    });
+  </script>
+</body>
+</html>

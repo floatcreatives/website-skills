@@ -1,0 +1,138 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import CTA from '../components/CTA.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { SITE, canonicalUrl, generateContactSchema } from '../data/site.config';
+import { contactContent } from '../data/content/contact';
+
+const contactSchema = generateContactSchema();
+const { badge, heading, description, methods, cta } = contactContent;
+---
+
+<Layout
+  title={`Contact Us${SITE.seo.titleSuffix}`}
+  description={`Contact ${SITE.name} at ${SITE.business.address.street}, ${SITE.business.address.locality}. Call ${SITE.business.contact.phone.display} or email ${SITE.business.contact.email}.`}
+  canonical={canonicalUrl("/contact/")}
+>
+  <Header />
+  <Breadcrumbs items={[{name: "Home", url: "/"}, {name: "Contact", url: "/contact"}]} />
+
+  <script type="application/ld+json" set:html={JSON.stringify(contactSchema)}></script>
+
+  <section class="py-20 sm:py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-16">
+
+        <div>
+          <span data-motion style="letter-spacing: -0.01em;" class="text-brand-600 text-sm font-semibold tracking-wide uppercase mb-4 block">{badge}</span>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-neutral-900 leading-tight mb-6">
+            <span data-animate>{heading}</span>
+          </h1>
+          <p data-animate class="text-lg text-neutral-600 mb-12">
+            {description}
+          </p>
+
+          <div class="flex flex-col gap-8">
+            <div data-motion style="--motion-delay:0ms" class="hover-lift flex items-start gap-5">
+              <div class={`icon-container w-14 h-14 ${methods.phone.iconBg} rounded-2xl flex items-center justify-center shrink-0`}>
+                <Icon name={methods.phone.icon} class={`w-7 h-7 ${methods.phone.iconColor}`} />
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-neutral-900 mb-1">{methods.phone.label}</h3>
+                <a href={`tel:${SITE.business.contact.phone.raw}`} class="ripple-container text-brand-600 text-lg hover:underline">{SITE.business.contact.phone.display}</a>
+                {methods.phone.hint && <p class="text-neutral-500 text-sm mt-1">{methods.phone.hint}</p>}
+              </div>
+            </div>
+
+            <div data-motion style="--motion-delay:80ms" class="hover-lift flex items-start gap-5">
+              <div class={`icon-container w-14 h-14 ${methods.whatsapp.iconBg} rounded-2xl flex items-center justify-center shrink-0`}>
+                <Icon name={methods.whatsapp.icon} class={`w-7 h-7 ${methods.whatsapp.iconColor}`} />
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-neutral-900 mb-1">{methods.whatsapp.label}</h3>
+                <a href={SITE.business.contact.whatsappUrl} target="_blank" class="ripple-container text-green-600 text-lg hover:underline">{SITE.business.contact.phone.display}</a>
+                {methods.whatsapp.hint && <p class="text-neutral-500 text-sm mt-1">{methods.whatsapp.hint}</p>}
+              </div>
+            </div>
+
+            <div data-motion style="--motion-delay:160ms" class="hover-lift flex items-start gap-5">
+              <div class={`icon-container w-14 h-14 ${methods.email.iconBg} rounded-2xl flex items-center justify-center shrink-0`}>
+                <Icon name={methods.email.icon} class={`w-7 h-7 ${methods.email.iconColor}`} />
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-neutral-900 mb-1">{methods.email.label}</h3>
+                <a href={`mailto:${SITE.business.contact.email}`} class="text-brand-600 text-lg hover:underline break-all">{SITE.business.contact.email}</a>
+              </div>
+            </div>
+
+            <div data-motion style="--motion-delay:240ms" class="hover-lift flex items-start gap-5">
+              <div class={`icon-container w-14 h-14 ${methods.address.iconBg} rounded-2xl flex items-center justify-center shrink-0`}>
+                <Icon name={methods.address.icon} class={`w-7 h-7 ${methods.address.iconColor}`} />
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-neutral-900 mb-1">{methods.address.label}</h3>
+                <p class="text-neutral-600 text-lg">{SITE.business.address.street}</p>
+                <p class="text-neutral-600">{SITE.business.address.locality}, {SITE.business.address.region} {SITE.business.address.postalCode}</p>
+                <p class="text-neutral-500 text-sm mt-1">{SITE.business.address.countryName}</p>
+              </div>
+            </div>
+
+            <div data-motion style="--motion-delay:320ms" class="hover-lift flex items-start gap-5">
+              <div class={`icon-container w-14 h-14 ${methods.hours.iconBg} rounded-2xl flex items-center justify-center shrink-0`}>
+                <Icon name={methods.hours.icon} class={`w-7 h-7 ${methods.hours.iconColor}`} />
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-neutral-900 mb-1">{methods.hours.label}</h3>
+                <p class="text-neutral-600 text-lg">{SITE.business.hours.display}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-motion class="hover-lift rounded-3xl overflow-hidden h-[500px] lg:h-auto min-h-[400px]">
+          <iframe
+            src={SITE.maps.googleMaps}
+            width="100%"
+            height="100%"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            class="rounded-3xl"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CTA
+    badge={cta.badge}
+    title={`Contact ${SITE.name} — ${cta.title}`}
+    description={cta.description}
+    buttonText="Send WhatsApp"
+    buttonLink={SITE.business.contact.whatsappUrl}
+    image="/images/placeholder.svg"
+    altText={`Contact ${SITE.name} — ${SITE.business.address.street}, ${SITE.business.address.locality}`}
+  />
+
+  <script>
+    document.querySelectorAll('.ripple-container').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        var ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        var rect = el.getBoundingClientRect();
+        var size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+        el.appendChild(ripple);
+        ripple.addEventListener('animationend', function() { ripple.remove(); });
+      });
+    });
+  </script>
+
+  <Footer />
+</Layout>

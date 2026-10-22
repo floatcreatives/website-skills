@@ -1,0 +1,93 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { SITE } from '../data/site.config';
+---
+
+<footer class="relative pt-16 bg-neutral-900 text-white overflow-hidden dark-section-glow">
+  <!-- Animated wave line at top -->
+  <div class="absolute top-0 left-0 right-0 h-1 overflow-hidden opacity-40" aria-hidden="true">
+    <div class="footer-wave flex" style="width: 200%;">
+      <svg class="w-1/2 h-1" viewBox="0 0 1200 4" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,2 Q150,0 300,2 T600,2 T900,2 T1200,2 L1200,4 L0,4 Z" fill="#3A6580"></path>
+      </svg>
+      <svg class="w-1/2 h-1" viewBox="0 0 1200 4" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,2 Q150,0 300,2 T600,2 T900,2 T1200,2 L1200,4 L0,4 Z" fill="#3A6580"></path>
+      </svg>
+    </div>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-12 gap-12 pb-12 border-b border-neutral-800">
+      <div class="lg:col-span-5 flex flex-col gap-6">
+        <a href="/" class="flex items-center gap-3 w-fit hover-lift">
+          <Logo class="h-12 w-auto rounded-2xl" />
+          <span class="text-2xl font-bold">{SITE.name}</span>
+        </a>
+          <p class="text-neutral-400 text-lg leading-relaxed max-w-sm">
+            {SITE.description}
+          </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-500/20 text-brand-400 text-xs font-semibold rounded-full tag-pill">
+            <Icon name="star" class="w-3.5 h-3.5" />
+            Trusted by our customers
+          </span>
+        </div>
+        <div class="flex gap-4">
+          <a href={`tel:${SITE.business.contact.phone.raw}`} class="hover-shimmer active:scale-[0.97] flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-full transition-colors">
+            <Icon name="phone" class="w-4 h-4" />
+            Call Us
+          </a>
+          <a href={SITE.business.contact.whatsappUrl} target="_blank" class="hover-shimmer active:scale-[0.97] flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-full transition-colors">
+            <Icon name="whatsapp" class="w-4 h-4" />
+            WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <div class="lg:col-span-3">
+        <h2 class="text-sm font-semibold text-neutral-400 uppercase tracking-wide mb-5" style="letter-spacing: -0.01em;">Quick Links</h2>
+        <ul class="flex flex-col gap-3">
+          {SITE.nav.footer.map((link) => (
+            <li><a href={link.href} class="text-neutral-400 hover:text-brand-400 transition-colors hover:translate-x-1 inline-block">{link.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="lg:col-span-4">
+        <h2 class="text-sm font-semibold text-neutral-400 uppercase tracking-wide mb-5" style="letter-spacing: -0.01em;">Contact</h2>
+        <div class="flex flex-col gap-3">
+          <a href={`tel:${SITE.business.contact.phone.raw}`} class="hover-lift flex items-center gap-3 text-neutral-400 hover:text-brand-400 transition-colors py-1">
+            <Icon name="phone" class="w-5 h-5 text-brand-400" />
+            {SITE.business.contact.phone.display}
+          </a>
+          <a href={`mailto:${SITE.business.contact.email}`} class="hover-lift flex items-center gap-3 text-neutral-400 hover:text-brand-400 transition-colors py-1">
+            <Icon name="mail" class="w-5 h-5 text-brand-400" />
+            {SITE.business.contact.email}
+          </a>
+          <a href={SITE.business.social.facebook} target="_blank" rel="noopener noreferrer" class="hover-lift flex items-center gap-3 text-neutral-400 hover:text-brand-400 transition-colors py-1">
+            <Icon name="facebook" class="w-5 h-5 text-brand-400" />
+            {new URL(SITE.business.social.facebook).hostname}{new URL(SITE.business.social.facebook).pathname}
+          </a>
+          <a href={SITE.business.social.instagram} target="_blank" rel="noopener noreferrer" class="hover-lift flex items-center gap-3 text-neutral-400 hover:text-brand-400 transition-colors py-1">
+            <Icon name="instagram" class="w-5 h-5 text-brand-400" />
+            {SITE.business.social.instagram.replace('https://www.', '@').replace(/\/$/, '').split('/').pop()}
+          </a>
+          <div class="flex items-start gap-3 text-neutral-400 py-1">
+            <Icon name="location" class="w-5 h-5 text-brand-400 shrink-0 mt-0.5" />
+            <span>{SITE.business.address.street}<br/>{SITE.business.address.locality}, {SITE.business.address.region} {SITE.business.address.postalCode}</span>
+          </div>
+          <div class="flex items-center gap-3 text-neutral-400 py-1">
+            <Icon name="clock" class="w-5 h-5 text-brand-400" />
+            {SITE.business.hours.display}
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <p class="text-neutral-500 text-sm">&copy; {new Date().getFullYear()} {SITE.business.legalName}. All rights reserved.</p>
+      <p class="text-neutral-600 text-xs">Trusted by our customers. {SITE.business.address.locality}, {SITE.business.address.countryName}</p>
+    </div>
+</footer>
