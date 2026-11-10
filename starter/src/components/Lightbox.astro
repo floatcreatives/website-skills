@@ -34,7 +34,8 @@ const { images } = Astro.props;
 
   <!-- Image container -->
   <div class="absolute inset-0 flex items-center justify-center p-4 sm:p-12 md:p-20">
-    <img id="lb-img" src="" alt="" class="lightbox-image max-w-full max-h-full object-contain rounded-3xl shadow-2xl" />
+    <!-- src is set by JS on open — an empty src here is intentional, not a broken asset (§7.14 override) -->
+    <img id="lb-img" src="" alt="" data-impeccable-ignore="broken-image" class="lightbox-image max-w-full max-h-full object-contain rounded-3xl shadow-2xl" />
   </div>
 
   <!-- Thumbnail strip -->

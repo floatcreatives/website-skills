@@ -78,7 +78,7 @@ html, body {
   html { scroll-behavior: smooth; }
   body { overflow-x: hidden; padding-top: 4rem; }
   @media (min-width: 1024px) { body { padding-top: 5rem; } }
-  * { font-family: 'Inter', sans-serif; }
+  * { font-family: 'Manrope', sans-serif; }
 
   [data-motion] {
     opacity: 0;
