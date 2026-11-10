@@ -37,7 +37,7 @@ When starting a new project from this template, ask the user for the following i
 | 19 | What is the **Instagram URL**? | `site.config.ts` → `SITE.business.social.instagram` |
 | 20 | What is the **Twitter handle**? | `site.config.ts` → `SITE.business.social.twitter` |
 | 21 | What **brand colors**? (Tailwind palette or hex) | `src/styles/theme.css` → `--color-brand-*` |
-| 22 | What **font** do you want to use? (default: Inter) | `src/styles/theme.css` + font files in `public/fonts/` |
+| 22 | What **font** do you want to use? (default: Manrope, Greek subset included) | `src/styles/theme.css` + font files in `public/fonts/` |
 | 23 | Provide a **logo SVG file**. | Replace `public/logo.svg` |
 
 ## 4. SEO

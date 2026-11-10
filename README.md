@@ -14,6 +14,7 @@ source.
 | Path | What it is | Who reads it |
 |---|---|---|
 | `BROCHURE-SITE-RULES.md` | **The contract.** Every rule, pattern and gate for building a brochure site. Source of truth. | Agents read it first, always |
+| `VERSION` | The rules revision (`1.2.0`). Every local agent skill must carry the same `version:` — one name, one number. | Everyone, before trusting a local copy |
 | `CLIENT-BRIEF.md` | Fill-in brief. Copy into a new project, fill it, hand to the agent. | You, before building |
 | `starter/` | Working Astro 7 + Tailwind v4 starter. 7 pages, 15 components, SEO/schema, sitemap. Build-verified. | Copy to start a project |
 | `repo-template/` | Files every new project repo carries: `AGENTS.md`, `.gitignore`, `.env.example`, `SETUP-CHECKLIST.md` | Copy into the project |

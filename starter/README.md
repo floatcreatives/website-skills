@@ -118,7 +118,7 @@ src/
 
 - **Single-source configuration** — Change business info, SEO, and content in 3 files
 - **JSON-LD structured data** — `LocalBusiness`, `WebSite`, `FAQPage`, `ContactPoint`, `ItemList`, `BreadcrumbList` schemas auto-generated from config
-- **Self-hosted fonts** — No Google Fonts request chain; Inter with Latin + Greek subsets
+- **Self-hosted fonts** — No Google Fonts request chain; Manrope variable with Latin + Greek subsets
 - **Responsive images** — `srcset`/`sizes` with WebP for all display contexts
 - **Scroll animations** — IntersectionObserver-based with staggered delays
 - **Production-ready SEO** — Open Graph, Twitter Cards, canonical, hreflang, robots, Google verification

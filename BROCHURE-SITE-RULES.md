@@ -16,6 +16,11 @@
 
 ## 0. What this file is
 
+> **VERSION: 1.2.0** — bump this number with every change to these rules, and bump the local
+> agent skill `float-website-skills` (`version:` in its frontmatter) to the same number in the same
+> change. One name, one version: `float-website-skills` v1.2.0 == `BROCHURE-SITE-RULES.md`
+> 1.2.0. The root `VERSION` file carries the same string.
+
 A portable contract for building **static brochure websites** (Astro + Tailwind CSS v4).
 Target projects: local businesses, restaurants, clinics, shops, villas, studios,
 small service companies — typically 3–15 pages, mostly static, contact/WhatsApp-driven.
@@ -75,6 +80,10 @@ Ask, in one message:
   dividers, restrained ornament) or **soft/rounded** (chips, capsules, friendly).
   Default per brief — leisure/premium defaults to sharp editorial. Asking this one
   question prevents a full visual rework later.
+- A **design anchor**, one sentence: the single image or idea the page is built around. If the
+  user has no opinion, the agent picks one from the brief and states it. State the **display
+  face**, the **palette source** and the **motion budget** in the same breath — these four lines
+  are part of the plan, not an afterthought. Full contract: §7.14.
 
 ### Phase A — Identity & scope
 - Business name, short tagline, one-line description (for SEO meta)
@@ -391,7 +400,7 @@ per brief. Pattern:
   /* ...50–950 via color-mix... */
   --color-brand-500: var(--brand-base);
 
-  --font-family-sans: 'Inter', sans-serif;   /* self-hosted, see §7.4 */
+  --font-family-sans: 'Manrope', sans-serif;  /* self-hosted, see §7.4 */
 
   --animate-shimmer: shimmer 2s ease-in-out infinite;
   --animate-float:    float 3s ease-in-out infinite;
@@ -401,19 +410,25 @@ per brief. Pattern:
 Components use tokens — never raw hex inside `.astro`.
 
 ### 7.4 Font self-host pattern
-For each weight + subset needed:
+Self-host one file per subset. Prefer a **variable** face: one file covers the whole weight
+range, instead of one file per weight (the starter's Inter set was 12 files / ~400 KB; Manrope
+variable is 2 files / 33 KB).
 ```css
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Manrope';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 800;          /* variable range */
   font-display: swap;
-  src: url('/fonts/inter-400-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, ...;
+  src: url('/fonts/manrope-var-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+                 U+2212, U+2215, U+FEFF, U+FFFD;
 }
 ```
-Add matching `<link rel="preload" as="font" type="font/woff2" crossorigin>` in
-`Layout.astro` **for the regular + bold weights only** (avoid over-preloading).
+Add a second block for the **Greek** subset (`U+0370-0377, U+037A-037F, U+0384-038A, U+038C,
+U+038E-03A1, U+03A3-03FF`) from `/fonts/manrope-var-greek.woff2`. Add matching
+`<link rel="preload" as="font" type="font/woff2" crossorigin>` in `Layout.astro` for those two
+files only. **Check the family actually ships a Greek subset before choosing it** (§7.14).
 
 ### 7.5 Swiper init pattern (works inside Astro static)
 ```astro
@@ -1247,6 +1262,63 @@ letterspaced overline labels + a short (3rem × 3px) gold underline bar beneath
 section titles (centered or left, matching alignment). Avoid dash/rule ornaments
 that read as boundary lines — clients perceive them as unfinished.
 
+### 7.14 Design default — good taste by default, never blocking a brief
+
+Two layers, never mixed up:
+
+| Layer | What a finding means |
+|---|---|
+| **Gate** — contrast, overflow, heading levels, tiny text, content hidden behind an animation | **Fix it.** Not waivable by a dev |
+| **Default** — the taste rules below | **Fix it, or waive it in one line with a reason** |
+
+A dev with no design instinct must be able to ship a good-looking site by following this page.
+A dev with a creative brief must never be stopped by it — only asked to write down why.
+
+**Anchor before layout (see §1).** If you cannot name the one image or idea the page is built
+around, you are about to build the trend instead of this business.
+
+**Never by default** — rule ids are the design detector's (§10, item 4):
+
+- **Palette:** purple/violet gradient or cyan-on-dark (`ai-color-palette`); the warm cream/beige
+  "tasteful" page background (`cream-palette`); gradient text (`gradient-text`); coloured glow
+  shadows, radial halos or spotlight washes (`dark-glow`, `radial-halo`, `radial-spotlight-glow`).
+- **Type:** Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, Space Grotesk (`overused-font`);
+  oversized italic serif hero (`italic-serif-display`); a full sentence at display size
+  (`oversized-h1`); size steps under 1.25× (`flat-type-hierarchy`); a tiny tracked-caps eyebrow
+  above the hero (`hero-eyebrow-chip`, `kicker-above-heading`); numbered section labels
+  (`numbered-section-labels`); all-caps body copy (`all-caps-body`).
+- **Layout:** cards inside cards (`nested-cards`); a rounded icon tile above every heading
+  (`icon-tile-stack`); a thick accent border on one side of a card (`side-tab`); one spacing value
+  everywhere (`monotonous-spacing`); a whole row wearing hairline border + wide shadow
+  (`gpt-thin-border-wide-shadow`); repeating-gradient stripes or a decorative grid background;
+  auto-scrolling marquee (`marquee`).
+- **Motion:** bounce/elastic easing (`bounce-easing`) — use ease-out-quart/quint/expo; decorative
+  pulsing dots (`pulsing-dot`) and blinking cursors (`blinking-cursor`).
+- **Copy:** marketing buzzwords — streamline, empower, world-class, cutting-edge
+  (`marketing-buzzword`); "X. Just Y." cadence across sections (`aphoristic-cadence`); em-dash
+  saturation (`em-dash-overuse`).
+
+**Greek-safe face shortlist.** A distinctive face is worth nothing on a Greek site if it has no
+Greek subset: the failure is silent per-glyph fallback, so one paragraph renders in two faces.
+Verified to serve Greek and absent from the overused list: **Manrope, Literata, Source Serif 4,
+IBM Plex Sans / Serif / Mono, Alegreya, Fira Sans, Commissioner, GFS Didot, GFS Neohellenic,
+Gentium Book Plus, Ubuntu.** The starter ships **Manrope** (variable, Greek + Latin). Starting
+points by attitude: sharp/editorial → GFS Didot or Source Serif 4 display + Manrope body;
+soft/friendly → Literata or Alegreya + Commissioner or Fira Sans; trade/utility → IBM Plex Sans,
+Plex Mono for figures.
+
+**The override — this is what keeps creativity unblocked.**
+
+1. *A deviation is allowed. An undocumented deviation is not.*
+2. Record it where the choice lives: `<!-- impeccable-disable overused-font: brand face, supplied
+   by client -->` in markup, or `data-impeccable-ignore="hard-offset-shadow"` on the element.
+3. Whole-project value ignore (brand font used everywhere):
+   `npx impeccable ignores add-value overused-font <Family> --reason "brand font"`.
+4. Gates are **not** waivable by a dev: contrast, overflow, heading levels, tiny text, content
+   hidden behind an animation. Fix them or ask the owner.
+5. Two attempts, then decide. Ship the deviation with its reason instead of negotiating
+   aesthetics with a checklist all afternoon.
+
 ---
 
 ## 8. SEO contract (day one, every project)
@@ -1307,6 +1379,12 @@ POST-SETUP.md (§12) so the human knows what's still pending.
    click menu open/close, open the lightbox, then assert zero console errors /
    uncaught exceptions and zero failed network requests on a cold load (cache
    cleared). Test scroll-dependent UX with real wheel/touch gestures.
+4. **Design detector** — `npx impeccable detect src/` for the code tells, and
+   `npx impeccable detect http://localhost:<port>` against the running server for the
+   rendered-only ones (contrast, tiny text, overflow). Exit `2` = findings, `1` = a target could
+   not be scanned. Triage per §7.14: `quality/*` findings are gates, `slop/*` findings are
+   defaults to fix or waive in one line with a reason. A clean scan is not proof the page is good —
+   the screenshots still decide.
 
 Self-check the agent must run mentally after each section:
 1. Did the build pass?
@@ -1439,6 +1517,11 @@ brief provides the *meaning*.
 - Don't reference icon names you haven't verified against the installed icon
   collection (builds fail with "Unable to locate…").
 - Don't delete or rename conventions this project already established without flagging.
+- Don't ship the reflex AI look — Inter, purple/violet gradient, cream off-white page, gradient
+  text, eyebrow kicker above the hero, rounded icon tile above every heading, nested cards,
+  coloured glow (§7.14). Waive one explicitly, in writing, or don't ship it.
+- Don't pick a display face without a Greek subset for a Greek brief — verify the `.woff2`, don't
+  assume (a font's Latin presence says nothing about its Greek coverage).
 
 ---
 
@@ -1459,6 +1542,10 @@ brief provides the *meaning*.
 | "blog comments" | Out of scope |
 | "newsletter" | Plain mailto or Formspree → email list provider (e.g. Buttondown) |
 | "share buttons" | Static anchor links (FB/X/LinkedIn share URLs) — no SDK |
+| "a hero" | one anchor image + a headline that carries itself — no eyebrow, no pill, no gradient (§7.14) |
+| "a font" / no preference | Manrope (starter default); otherwise the §7.14 shortlist, Greek subset verified |
+| "make it pop" / "more premium" | name the move (bolder / quieter / typeset) and one target — never restyle the whole page |
+| "make it look like <competitor>" | copy the structure and the information order, never the palette, type or tells |
 
 ---
 

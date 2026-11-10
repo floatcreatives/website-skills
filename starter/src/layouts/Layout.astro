@@ -32,6 +32,8 @@ const websiteSchema = generateWebsiteSchema();
   {canonical && <link rel="canonical" href={canonical}>}
   {isHomepage && <meta name="google-site-verification" content={SITE.googleVerification}>}
   {isHomepage && <link rel="preload" as="image" href={SITE.heroImage} type="image/webp" fetchpriority="high">}
+  <link rel="preload" as="font" href="/fonts/manrope-var-latin.woff2" type="font/woff2" crossorigin>
+  <link rel="preload" as="font" href="/fonts/manrope-var-greek.woff2" type="font/woff2" crossorigin>
   
   <!-- Open Graph -->
   <meta property="og:type" content="business.business">
@@ -66,11 +68,6 @@ const websiteSchema = generateWebsiteSchema();
   <link rel="manifest" href="/manifest.json">
   
   <!-- Preload self-hosted Inter fonts (critical for FCP/LCP) -->
-  <link rel="preload" as="font" href="/fonts/inter-400-latin.woff2" type="font/woff2" crossorigin>
-  <link rel="preload" as="font" href="/fonts/inter-500-latin.woff2" type="font/woff2" crossorigin>
-  <link rel="preload" as="font" href="/fonts/inter-600-latin.woff2" type="font/woff2" crossorigin>
-  <link rel="preload" as="font" href="/fonts/inter-700-latin.woff2" type="font/woff2" crossorigin>
-  <link rel="preload" as="font" href="/fonts/inter-400-greek.woff2" type="font/woff2" crossorigin>
 </head>
 <body class="bg-white">
   <!-- Skip to content -->
