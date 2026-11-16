@@ -35,9 +35,11 @@ copy.
 
 ## 4. The Hermes skill copy is older still
 
-`~/.hermes/skills/software-development/brochure-website-astro-tailwind/references/BROCHURE-SITE-RULES.md`
-still holds the **2026-07-05** revision (md5 `ea73936e`) — two revisions behind the
-canonical file. Reload it from this repo before using the skill.
+**Resolved 2026-11-16.** The old path
+`~/.hermes/skills/software-development/brochure-website-astro-tailwind/` no longer exists, and no stale
+`BROCHURE-SITE-RULES.md` copy remains under `~/.hermes/skills`. The live skill is
+`~/.hermes/skills/web/float-website-skills` (permanent name, bumped to 1.2.1 with this change, §0 default
+kit + `references/i18n-bilingual.md`), which reads this repo for anything it does not carry.
 
 ## 5. Superseded repos
 
@@ -46,3 +48,20 @@ canonical file. Reload it from this repo before using the skill.
   **Zero client projects ever used it.** Archived 2026-10-22.
 - `CubeSeven/float-skills`, `CubeSeven/astro-business-template` — superseded by
   this repo.
+
+## 6. `starter/` does not yet carry the §0.5 kit
+
+§0.5 (added 2026-11-16) makes these mandatory on every build, and the starter still ships none of them:
+
+- **No `src/i18n/` scaffold.** §0.5.4 wants a typed dictionary with `en.ts` stubbed against `Dict`, so a
+  second language is one file. Every project currently invents its own shape, which is how the seam gets
+  skipped.
+- **No `scripts/check-third-party.mjs`.** §0.5.5 claims "no cookies, no banner" and that claim is only
+  gated if the checker runs in `npm run build`. The script exists in the Hermes skill
+  (`float-website-skills`) and needs to move here as the canonical copy.
+- **No `public/robots.txt`** with a sitemap line, and `sitemap()` is called without the `i18n` block that
+  §0.5.4 requires once a second locale exists.
+- **No skip link / `<main id="main">`** and no `scroll-margin-top` on anchor targets (§0.5.3).
+
+Decision needed: fold these into the starter (one commit, then re-verify the build), or leave the rules
+ahead of the starter and say so here until someone does. The rules lead; the starter does not follow yet.
