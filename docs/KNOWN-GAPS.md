@@ -33,16 +33,32 @@ starter inherits the debt.
 with no warning. Projects should point at this repo's URL instead of carrying a
 copy.
 
-## 4. The Hermes skill copy is older still
+## 4. Stale local rule copies — fixed 2026-11
 
-`~/.hermes/skills/software-development/brochure-website-astro-tailwind/references/BROCHURE-SITE-RULES.md`
-still holds the **2026-07-05** revision (md5 `ea73936e`) — two revisions behind the
-canonical file. Reload it from this repo before using the skill.
+The copy previously named here (`~/.hermes/skills/software-development/brochure-website-astro-tailwind/`)
+no longer exists. The local agent skill is now `float-website-skills`, deliberately named after
+this repo, and its frontmatter `version:` must equal the root `VERSION` file. When the rules change
+here, bump `VERSION` and the skill's `version:` in the same change — otherwise a machine silently
+builds against an older contract, which is exactly the drift gap 3 describes.
 
-## 5. Superseded repos
+## 5. The starter does not yet pass its own §7.14 detector gate
 
-- `CubeSeven/astro-website-base-template` (`square-series`) — an unused redesign
-  experiment: no Tailwind, no Swiper, own `src/ui/sections` block library.
-  **Zero client projects ever used it.** Archived 2026-10-22.
-- `CubeSeven/float-skills`, `CubeSeven/astro-business-template` — superseded by
-  this repo.
+`npx impeccable detect dist/` on the freshly built starter reports **55 findings**, which means
+every new project inherits them. Fixed in the same change that added the gate: two low-contrast
+pairs (`white` on `green-600` → `green-700`, `brand-400` on a `brand-500/15` pill → `brand-700`),
+two skipped heading levels (contact methods and FAQ questions were `h3` under an `h1`), and the
+decorative footer wave is now explicitly waived (`data-impeccable-ignore="marquee"`).
+
+What is left, and why it is a gap rather than a bug list:
+
+- **54 × `cramped-padding`.** Almost all land on card wrappers (`p-8`, `p-6`, `bg-neutral-50`) and
+  section shells whose children carry their own inset, so the rule is measuring the wrapper's own
+  edge. Needs a human pass with the overlay: either the wrapper genuinely clips a child's text, or
+  the finding is noise on a placeholder template. Do not mass-add padding to clear the count.
+- **1 × `low-contrast` on a `:hover` state** — the service-card title transitions (`500ms`) to
+  `white`/`brand-100` while the background is still `white`, so the computed hover state passes
+  through ~1.1:1. Fix is to delay the color transition behind the background, not to change the
+  end colours.
+
+Until this passes, state the count when handing a project over rather than reporting the gate as
+clean.
