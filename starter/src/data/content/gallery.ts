@@ -1,6 +1,9 @@
 export interface GalleryImage {
   src: string;
   alt: string;
+  /** Intrinsic size — required, so the grid reserves space and nothing shifts (CLS). */
+  width: number;
+  height: number;
 }
 
 export interface GalleryPageContent {
@@ -18,22 +21,32 @@ export const galleryImages: GalleryImage[] = [
   {
     src: "/images/placeholder.svg",
     alt: "Replace with your gallery image 1 — describe the image for SEO and accessibility",
+    width: 1600,
+    height: 1067,
   },
   {
     src: "/images/placeholder.svg",
     alt: "Replace with your gallery image 2",
+    width: 1600,
+    height: 1067,
   },
   {
     src: "/images/placeholder.svg",
     alt: "Replace with your gallery image 3",
+    width: 1600,
+    height: 1067,
   },
   {
     src: "/images/placeholder.svg",
     alt: "Replace with your gallery image 4",
+    width: 1600,
+    height: 1067,
   },
   {
     src: "/images/placeholder.svg",
     alt: "Replace with your gallery image 5",
+    width: 1600,
+    height: 1067,
   },
 ];
 

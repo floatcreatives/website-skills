@@ -2,6 +2,16 @@
 
 A production-ready Astro website skeleton for local businesses. Built with Astro, Tailwind CSS v4, and TypeScript. Optimized for SEO, accessibility, and performance.
 
+## Conformance gate
+
+```bash
+npm run build
+npm run check:platform   # headers, max-image-preview, colour-scheme, hero priority, dimensions, h1, tabindex, budgets
+```
+
+`check:platform` asserts what Lighthouse still scores 100: the things that ship broken and silent.
+Rules behind it: `BROCHURE-SITE-RULES.md` §9, §9.7, §18.
+
 ## Quick Start — Using This Template for a New Project
 
 ```bash

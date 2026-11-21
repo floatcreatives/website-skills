@@ -14,7 +14,7 @@
  */
 /* Starter face: Manrope — variable, Greek + Latin subsets, self-hosted.
    Not on the AI-slop overused list (Inter/Roboto/Fraunces/Geist/Plus Jakarta/Space Grotesk).
-   Any face you swap in MUST actually ship a Greek subset — see BROCHURE-SITE-RULES.md §7.14. */
+   Any face you swap in MUST actually ship a Greek subset — see BROCHURE-SITE-RULES.md §7.16. */
 @font-face {
   font-family: 'Manrope';
   font-style: normal;
@@ -30,6 +30,17 @@
   font-display: swap;
   src: url(/fonts/manrope-var-greek.woff2) format('woff2');
   unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+
+/* Fallback face with matched metrics, so the swap to Manrope does not reflow (CLS).
+   Tune the percentages against the real face once; keep them with the font. */
+@font-face {
+  font-family: 'Manrope Fallback';
+  src: local('Arial'), local('Helvetica Neue'), local('Liberation Sans');
+  size-adjust: 103%;
+  ascent-override: 96%;
+  descent-override: 26%;
+  line-gap-override: 0%;
 }
 
 /* ── Brand Theme ───────────────────────────────────────────────── */
@@ -50,8 +61,8 @@
   --color-brand-900: #111827;
   --color-brand-950: #030712;
 
-  /* Font family override (Manrope is the starter default — see §7.14) */
-  --font-family-sans: 'Manrope', sans-serif;
+  /* Font family override (Manrope is the starter default — see §7.16) */
+  --font-family-sans: 'Manrope', 'Manrope Fallback', sans-serif;
 
   /* Animations (structural — rarely need to change) */
   --animate-shimmer: shimmer 2s ease-in-out infinite;

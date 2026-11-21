@@ -24,7 +24,7 @@ const { hero, story, cta } = aboutContent;
 
   <section class="relative min-h-[60vh] flex items-center bg-neutral-900 hero-noise hero-vignette">
     <div class="absolute inset-0 overflow-hidden">
-      <img src="/images/placeholder.svg" srcset={buildSrcset("/images/placeholder.svg")} sizes={heroSizes} alt={`About ${SITE.name}`} class="parallax-bg w-full h-full object-cover opacity-40 scale-110 will-change-transform">
+      <img src="/images/placeholder.svg" srcset={buildSrcset("/images/placeholder.svg")} sizes={heroSizes} width="1600" height="600" alt={`About ${SITE.name}`} class="parallax-bg w-full h-full object-cover opacity-40 scale-110 will-change-transform">
     </div>
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
       <span data-motion class="inline-block text-brand-400 text-sm font-semibold tracking-widest uppercase mb-6" style="letter-spacing: -0.01em;">{hero.badge}</span>
@@ -43,7 +43,7 @@ const { hero, story, cta } = aboutContent;
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid lg:grid-cols-2 gap-12 items-center">
         <div data-motion class="rounded-3xl overflow-hidden hover-lift">
-          <img src={story.image} alt={story.alt} class="w-full h-[500px] object-cover" loading="lazy" decoding="async" srcset={buildSrcset(story.image)} sizes={halfSizes} />
+          <img src={story.image} alt={story.alt} width="1200" height="750" class="w-full h-[500px] object-cover" loading="lazy" decoding="async" srcset={buildSrcset(story.image)} sizes={halfSizes} />
         </div>
         <div data-motion>
           <span class="text-brand-600 text-sm font-semibold tracking-wide uppercase mb-4 block" style="letter-spacing: -0.01em;">{story.badge}</span>

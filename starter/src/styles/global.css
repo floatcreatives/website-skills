@@ -1,8 +1,31 @@
 @import "tailwindcss";
 @import "./theme.css";
 
-html, body {
-  overflow-x: hidden;
+/* No `overflow-x: hidden` on html/body — it clips real content and hides the bug that caused it.
+   Overflow is fixed at the offending element, then asserted: scrollWidth <= innerWidth. */
+
+html {
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  text-wrap: pretty;
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
 }
 
 @keyframes shimmer {

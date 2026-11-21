@@ -14,9 +14,9 @@ Decision needed: either rewrite both sliders on Swiper, or amend §4.1 to say
 "vanilla carousels for simple cases, Swiper when the brief needs drag/free-mode/
 looped sliders". Today the starter works; it just is not what the rules say.
 
-## 2. `npm run check` reports 99 type errors
+## 2. `npm run check` reports 98 type errors
 
-`astro check` (strict tsconfig) fails with ~99 errors in the inline client
+`astro check` (strict tsconfig) fails with ~98 errors in the inline client
 scripts — DOM nullability (`'carousel' is possibly 'null'`), implicit `any`
 params, `.style` on `Element`, plus a few in data files. Concentrated in
 `DeliveryAreasSlider.astro` (26), `TestimonialsSlider.astro` (26),
@@ -74,7 +74,7 @@ What is left, and why it is a gap rather than a bug list:
 Until this passes, state the count when handing a project over rather than reporting the gate as
 clean.
 
-## 7. `starter/` does not yet carry the §0.5 kit
+## 7. `starter/` carries most of the §0.5 kit, not all of it
 
 §0.5 (added 2026-11-16) makes these mandatory on every build, and the starter still ships none of them:
 
@@ -88,5 +88,30 @@ clean.
   §0.5.4 requires once a second locale exists.
 - **No skip link / `<main id="main">`** and no `scroll-margin-top` on anchor targets (§0.5.3).
 
-Decision needed: fold these into the starter (one commit, then re-verify the build), or leave the rules
-ahead of the starter and say so here until someone does. The rules lead; the starter does not follow yet.
+**Shipped in 1.3.0** (this gap is now partial): `public/_headers` with the §18 set, `max-image-preview:large`,
+a two-value `theme-color` + `color-scheme`, `fetchpriority="high"` + dimensions on the hero, dimensions on
+every other `<img>` including the gallery data type, font metric overrides, `text-wrap` defaults, the
+`overflow-x: hidden` hack removed, `scripts/check-platform.mjs` gating all of it on `dist/`.
+
+Still missing, and still the reason this gap stays open:
+
+- **No `src/i18n/` scaffold.** §0.5.4 wants a typed dictionary with the default language stubbed against
+  `Dict`, so a second language is one file. `SITE.alternateLocales` exists and `hreflang` follows it, but
+  the copy is still embedded in `site.config.ts` and `src/data/content/*`.
+- **No `scripts/check-third-party.mjs`.** §0.5.5 claims "no cookies, no banner" and that claim is only
+  gated if the checker runs in `npm run build`. The script exists in the Hermes skill
+  (`float-website-skills`) and needs to move here as the canonical copy.
+- **No interaction-loaded map facade.** The contact map is a live Google iframe with `loading="lazy"`;
+  §0.5.5 wants a click-to-load facade so nothing third-party loads before consent.
+
+Decision needed: fold the i18n scaffold and the facade into the starter (one commit, then re-verify the
+build), or leave the rules ahead of the starter and say so here until someone does.
+## 8. Every shipped site predates the 1.3.0 conformance rules
+
+Measured 2026-11-21 across the 17 built client repos: **0/17** serve a real security-header policy
+(no CSP, no HSTS), **0/17** survive forced-colours mode, 11/17 lack `autocomplete` tokens on form fields,
+11/17 lack `max-image-preview:large`, 12/17 still build their overlay as `<div role="dialog">`, 2/17 have
+no `fetchpriority` on any image. The starter carries the fixes from now on; the existing sites do not.
+
+Retrofit plan, batches and per-site matrix: `docs/RETROFIT-2026-11.md`. This gap closes when that plan has
+run, not when the rules change.

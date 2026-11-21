@@ -33,6 +33,8 @@ const { badge, heading, description, cta } = galleryPageContent;
           <img
             src={images[0].src}
             alt={images[0].alt}
+            width={images[0].width}
+            height={images[0].height}
             data-index="0"
             class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="eager"
@@ -51,6 +53,8 @@ const { badge, heading, description, cta } = galleryPageContent;
               <img
                 src={img.src}
                 alt={img.alt}
+                width={img.width}
+                height={img.height}
                 data-index={i + 1}
                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"

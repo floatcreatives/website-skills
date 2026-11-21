@@ -35,14 +35,14 @@ const { images } = Astro.props;
   <!-- Image container -->
   <div class="absolute inset-0 flex items-center justify-center p-4 sm:p-12 md:p-20">
     <!-- src is set by JS on open — an empty src here is intentional, not a broken asset (§7.14 override) -->
-    <img id="lb-img" src="" alt="" data-impeccable-ignore="broken-image" class="lightbox-image max-w-full max-h-full object-contain rounded-3xl shadow-2xl" />
+    <img id="lb-img" src="" alt="" width="1600" height="1200" data-impeccable-ignore="broken-image" class="lightbox-image max-w-full max-h-full object-contain rounded-3xl shadow-2xl" />
   </div>
 
   <!-- Thumbnail strip -->
   <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 max-w-[90vw] overflow-x-auto px-2 py-2 rounded-2xl bg-white/5 scrollbar-hide">
     {images.map((img, i) => (
       <button class="lb-thumb w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden flex-shrink-0 border-2 border-transparent hover:border-white/50 transition-all hover:scale-105" data-index={i} aria-label={`Go to image ${i + 1}`}>
-        <img src={img.src} alt="" class="w-full h-full object-cover" loading="lazy" decoding="async" />
+        <img src={img.src} alt="" width="56" height="56" class="w-full h-full object-cover" loading="lazy" decoding="async" />
       </button>
     ))}
   </div>
