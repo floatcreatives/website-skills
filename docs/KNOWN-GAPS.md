@@ -33,13 +33,16 @@ starter inherits the debt.
 with no warning. Projects should point at this repo's URL instead of carrying a
 copy.
 
-## 4. The Hermes skill copy is older still
+## 4. Stale local rule copies — fixed 2026-11
 
-**Resolved 2026-11-16.** The old path
-`~/.hermes/skills/software-development/brochure-website-astro-tailwind/` no longer exists, and no stale
+**Resolved 2026-11-16.** The copy previously named here
+(`~/.hermes/skills/software-development/brochure-website-astro-tailwind/`) no longer exists, and no stale
 `BROCHURE-SITE-RULES.md` copy remains under `~/.hermes/skills`. The live skill is
-`~/.hermes/skills/web/float-website-skills` (permanent name, bumped to 1.2.1 with this change, §0 default
-kit + `references/i18n-bilingual.md`), which reads this repo for anything it does not carry.
+`~/.hermes/skills/web/float-website-skills` — deliberately named after this repo, bumped to 1.2.1 with
+this change (§0.5 default kit + `references/i18n-bilingual.md`) — and it reads this repo for anything it
+does not carry. Its frontmatter `version:` must equal the root `VERSION` file: when the rules change here,
+bump `VERSION` and the skill's `version:` in the same change, otherwise a machine silently builds against
+an older contract, which is exactly the drift gap 3 describes.
 
 ## 5. Superseded repos
 
@@ -49,7 +52,29 @@ kit + `references/i18n-bilingual.md`), which reads this repo for anything it doe
 - `CubeSeven/float-skills`, `CubeSeven/astro-business-template` — superseded by
   this repo.
 
-## 6. `starter/` does not yet carry the §0.5 kit
+## 6. The starter does not yet pass its own §7.14 detector gate
+
+`npx impeccable detect dist/` on the freshly built starter reports **55 findings**, which means
+every new project inherits them. Fixed in the same change that added the gate: two low-contrast
+pairs (`white` on `green-600` → `green-700`, `brand-400` on a `brand-500/15` pill → `brand-700`),
+two skipped heading levels (contact methods and FAQ questions were `h3` under an `h1`), and the
+decorative footer wave is now explicitly waived (`data-impeccable-ignore="marquee"`).
+
+What is left, and why it is a gap rather than a bug list:
+
+- **54 × `cramped-padding`.** Almost all land on card wrappers (`p-8`, `p-6`, `bg-neutral-50`) and
+  section shells whose children carry their own inset, so the rule is measuring the wrapper's own
+  edge. Needs a human pass with the overlay: either the wrapper genuinely clips a child's text, or
+  the finding is noise on a placeholder template. Do not mass-add padding to clear the count.
+- **1 × `low-contrast` on a `:hover` state** — the service-card title transitions (`500ms`) to
+  `white`/`brand-100` while the background is still `white`, so the computed hover state passes
+  through ~1.1:1. Fix is to delay the color transition behind the background, not to change the
+  end colours.
+
+Until this passes, state the count when handing a project over rather than reporting the gate as
+clean.
+
+## 7. `starter/` does not yet carry the §0.5 kit
 
 §0.5 (added 2026-11-16) makes these mandatory on every build, and the starter still ships none of them:
 

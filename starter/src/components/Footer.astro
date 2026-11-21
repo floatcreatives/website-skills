@@ -7,7 +7,8 @@ import { SITE } from '../data/site.config';
 <footer class="relative pt-16 bg-neutral-900 text-white overflow-hidden dark-section-glow">
   <!-- Animated wave line at top -->
   <div class="absolute top-0 left-0 right-0 h-1 overflow-hidden opacity-40" aria-hidden="true">
-    <div class="footer-wave flex" style="width: 200%;">
+    <!-- decorative seam, not content: no reading order, no information. Waived per §7.14 -->
+    <div class="footer-wave flex" data-impeccable-ignore="marquee" style="width: 200%;" aria-hidden="true">
       <svg class="w-1/2 h-1" viewBox="0 0 1200 4" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M0,2 Q150,0 300,2 T600,2 T900,2 T1200,2 L1200,4 L0,4 Z" fill="#3A6580"></path>
       </svg>
@@ -28,7 +29,7 @@ import { SITE } from '../data/site.config';
             {SITE.description}
           </p>
         <div class="flex flex-wrap gap-2">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-500/20 text-brand-400 text-xs font-semibold rounded-full tag-pill">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-500/15 text-brand-700 text-xs font-semibold rounded-full tag-pill">
             <Icon name="star" class="w-3.5 h-3.5" />
             Trusted by our customers
           </span>
@@ -38,7 +39,7 @@ import { SITE } from '../data/site.config';
             <Icon name="phone" class="w-4 h-4" />
             Call Us
           </a>
-          <a href={SITE.business.contact.whatsappUrl} target="_blank" class="hover-shimmer active:scale-[0.97] flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-full transition-colors">
+          <a href={SITE.business.contact.whatsappUrl} target="_blank" class="hover-shimmer active:scale-[0.97] flex items-center gap-2 px-4 py-2 bg-green-700 hover:bg-green-800 text-white text-sm font-semibold rounded-full transition-colors">
             <Icon name="whatsapp" class="w-4 h-4" />
             WhatsApp
           </a>
