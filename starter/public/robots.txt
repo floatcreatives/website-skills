@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
+# Replace yourdomain.com with SITE.url before launch (POST-SETUP.md item 1)
 Sitemap: https://yourdomain.com/sitemap.xml

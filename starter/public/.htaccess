@@ -12,14 +12,14 @@ RewriteEngine On
     # Clickjacking protection
     Header always set X-Frame-Options "DENY"
 
-    # XSS protection
-    Header always set X-XSS-Protection "1; mode=block"
-
     # Referrer policy
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 
     # Permissions policy (restrict unnecessary features)
-    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
+    # Content Security Policy — same set as public/_headers, tightened with hashes once stable
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; frame-src https://www.openstreetmap.org https://www.google.com; form-action 'self' https://formspree.io https://api.web3forms.com; frame-ancestors 'none'; base-uri 'none'; object-src 'none'"
 </IfModule>
 
 # --- COMPRESSION ---

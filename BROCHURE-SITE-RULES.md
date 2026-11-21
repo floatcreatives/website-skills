@@ -16,10 +16,10 @@
 
 ## 0. What this file is
 
-> **VERSION: 1.2.1** — bump this number with every change to these rules, and bump the local
+> **VERSION: 1.3.0** — bump this number with every change to these rules, and bump the local
 > agent skill `float-website-skills` (`version:` in its frontmatter) to the same number in the same
-> change. One name, one version: `float-website-skills` v1.2.1 == `BROCHURE-SITE-RULES.md`
-> 1.2.1. The root `VERSION` file carries the same string.
+> change. One name, one version: `float-website-skills` v1.3.0 == `BROCHURE-SITE-RULES.md`
+> 1.3.0. The root `VERSION` file carries the same string.
 
 A portable contract for building **static brochure websites** (Astro + Tailwind CSS v4).
 Target projects: local businesses, restaurants, clinics, shops, villas, studios,
@@ -55,7 +55,7 @@ scaffolding: it decides what the build contains, not just how it looks.
 | Full-screen mobile menu | §4, §7.7 | open state captured at 390, close control visible, ESC + both scroll roots locked |
 | Hero scrim + open-now status line | §4, §7 | computed open/closed state asserted, not the label |
 | Text and image reveals | §4, §7.10 | every `[data-reveal]` animated after a full scroll, zero stuck |
-| Hover floor on every control | §7.14 | lift + icon nudge, nav underline, card zoom ~3%, focus ring, lightbox fade |
+| Hover floor on every control | §7.16 | lift + icon nudge, nav underline, card zoom ~3%, focus ring, lightbox fade |
 | Parallax on every full-bleed band | §4, §7.10 | band captured, `scrollWidth - innerWidth === 0` |
 | Gallery / rail with lightbox | §4, §7.5 | counter, arrows, ESC, swipe, focus return |
 | Reviews rail (CSS scroll-snap) | §7.6 | manual swipe keeps the counter in sync |
@@ -81,6 +81,9 @@ page where each section picked a different radius, easing and heading size.
 | Motion | `--dur-1: 180ms` (hover), `--dur-2: 420ms` (reveal), `--dur-3: 700ms` (band); one easing `cubic-bezier(.22,.61,.36,1)`; no bounce |
 | Focus | `:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px }`, styled once for every control |
 | Icons | one set, one stroke width (1.5), two sizes (18 nav / 20 CTA); never two sets |
+| Font metrics | every `@font-face` carries `size-adjust` + `ascent-override` matched to the fallback face, so the swap does not reflow the first screen (§9.7) |
+| Wrapping | `text-wrap: pretty` on body copy, `text-wrap: balance` on headings only — never `* { text-wrap: balance }`, the browser cost is real |
+| Viewport units | `dvh`/`svh` for full-height sections; never `100vw` for a full-width box (it ignores the scrollbar) |
 
 Primitives every section composes, so a bespoke value in a section is a bug: `.btn` (solid / outline /
 text, hover lift with icon nudge), `.eyebrow` (caps micro, one fact only), `.rule` (1px hairline
@@ -97,8 +100,20 @@ reflex killer), `.field` (label + input + focus ring + error state).
 - **Honeypot + `reportValidity()` on every form, never a captcha.** A static site cannot validate on the
   server; say so rather than implying it.
 - **`robots.txt` with the sitemap line**, and `lastmod` in the sitemap.
-- **A loading screen only when the hero is heavy**, opt-in, removed on `load`, never a condition for the
-  content to exist.
+- **A loading screen only when the hero is heavy**, opt-in, removed on `load`, never a condition for
+  the content to exist.
+- **`public/_headers` shipped with every build** (Netlify / Cloudflare Pages syntax; `vercel.json` for
+  Vercel, `.htaccess` only for Apache hosts): HSTS, `X-Content-Type-Options`, `Referrer-Policy`,
+  `Permissions-Policy`, `frame-ancestors 'none'`, one-year immutable caching for hashed assets, and
+  `Cache-Control` that keeps HTML bfcache-able. Full set and rationale: §18.
+- **`<meta name="robots" content="index, follow, max-image-preview:large">`** on every indexable page —
+  without `max-image-preview:large` Google shows a smaller preview image; `noindex` only on 404 and on
+  a staging host.
+- **`color-scheme` plus a two-value `theme-color`** (`prefers-color-scheme: light` / `dark`) so the
+  browser chrome and native form controls match the page instead of flashing white. A dark palette is a
+  brief decision; the `color-scheme` declaration is not.
+- **A recorded Core Web Vitals baseline** — PageSpeed Insights on the deployed URL, mobile, at p75, with
+  LCP / INP / CLS pasted into `POST-SETUP.md`. A site with no field numbers is not verified (§9.7).
 
 ### 0.5.4 Bilingual-ready from day one
 
@@ -181,7 +196,7 @@ Ask, in one message:
 - A **design anchor**, one sentence: the single image or idea the page is built around. If the
   user has no opinion, the agent picks one from the brief and states it. State the **display
   face**, the **palette source** and the **motion budget** in the same breath — these four lines
-  are part of the plan, not an afterthought. Full contract: §7.14.
+  are part of the plan, not an afterthought. Full contract: §7.16.
 
 ### Phase A — Identity & scope
 - Business name, short tagline, one-line description (for SEO meta)
@@ -190,6 +205,27 @@ Ask, in one message:
 - List of pages wanted (suggested menu: Home, About, Services/Products, Gallery,
   Contact, FAQ, Blog — user picks which)
 - Scope tag: `brochure` | `multi-page` | `multi-language`
+
+### Phase A.5 — Niche and competitor pass (the quality lever nobody skips twice)
+
+The brief says what the client wants. The niche says what "best in this market" already looks like, and
+what the visitor has already seen twice before landing here. Best-possible version means beating the
+best local site, not the average one. Time-box: 25 minutes. Output: `RESEARCH.md` in the project root.
+
+- **Pick three: the top local organic result, the client's own chosen benchmark, and one best-in-class
+  site from the same category outside the region.** A taverna in Skiathos competes with the two
+  tavernas on the same beach and with the best taverna site in the Aegean — not with a SaaS landing page.
+- For each, record in six lines: URL · page/section inventory · the one thing it does better than the
+  client could · the section order on the home page · the words it uses for its own services (their
+  keywords, not ours) · what its reviews praise and complain about.
+- Then write the two columns that decide the build:
+  - **Table stakes** — sections every competitor ships. Missing one reads as an incomplete site, so these
+    are in unless the brief says otherwise.
+  - **The wedge** — one thing none of them does that this business can honestly claim. That is the hero,
+    the anchor image and the one section that gets the extra art direction (§7.16).
+- **Copy the information order, never the execution** (§17). Palette, type, motion and layout are ours.
+- If a competitor blocks or is unreachable, say so and move on. Never write a research section from
+  memory of what tourism sites usually contain — that is how the generic build gets made.
 
 ### Phase B — Business facts
 - Phone (display + raw), email, WhatsApp number
@@ -308,10 +344,11 @@ For each, two columns: **Behaviour (hard rule)** and **Recommended lib (soft def
   the larger image (or full-res); prev/next arrows; caption from alt text; close on
   ESC, overlay-click, and X button; swipe left/right and up-to-dismiss on touch;
   body scroll locked while open; restored focus on close; respects reduced motion.
-- **Library:** GLightbox for larger galleries (>20 images) or when touch-swipe/zoom
-  is needed. Vanilla zero-dependency lightbox (§7.6b) for smaller galleries — lighter
-  bundle, no npm dependency. Swiper's lightbox module if Swiper is already loaded.
-  See §7.6 for both patterns.
+- **Library:** none by default. The overlay is a native `<dialog>` opened with `showModal()` (§7.6b),
+  which gives the focus trap, `inert` background, top layer and ESC for free; 20 images or 200, the
+  markup does not change. An external lightbox is allowed only when the brief needs pinch-zoom or pan,
+  and even then the overlay element must still be a `<dialog>` — the verify gate asserts
+  `dialog[open]`. A `<div role="dialog">` fails the gate, not just the review.
 
 ### 4.3 Mobile menu
 - **Behaviour:** hamburger toggle; overlay covers screen; links stagger in; body
@@ -526,7 +563,7 @@ variable is 2 files / 33 KB).
 Add a second block for the **Greek** subset (`U+0370-0377, U+037A-037F, U+0384-038A, U+038C,
 U+038E-03A1, U+03A3-03FF`) from `/fonts/manrope-var-greek.woff2`. Add matching
 `<link rel="preload" as="font" type="font/woff2" crossorigin>` in `Layout.astro` for those two
-files only. **Check the family actually ships a Greek subset before choosing it** (§7.14).
+files only. **Check the family actually ships a Greek subset before choosing it** (§7.16).
 
 ### 7.5 Swiper init pattern (works inside Astro static)
 ```astro
@@ -1360,7 +1397,7 @@ letterspaced overline labels + a short (3rem × 3px) gold underline bar beneath
 section titles (centered or left, matching alignment). Avoid dash/rule ornaments
 that read as boundary lines — clients perceive them as unfinished.
 
-### 7.14 Design default — good taste by default, never blocking a brief
+### 7.16 Design default — good taste by default, never blocking a brief
 
 Two layers, never mixed up:
 
@@ -1421,34 +1458,205 @@ Plex Mono for figures.
 
 ## 8. SEO contract (day one, every project)
 
-- `<title>` = page name + titleSuffix; meta description from brief.
-- Canonical link via `canonicalUrl(path)`.
-- OpenGraph + Twitter card meta in `Layout.astro` (uses `SITE.seo.defaultOGImage`).
-- JSON-LD `LocalBusiness` (or `Restaurant`, `Store`, `HealthAndBeautyBusiness`,
-  `LodgingBusiness` per brief) on every page via the generator.
-- BreadcrumbList on every interior page.
-- `sitemap-index.xml` via `@astrojs/sitemap`.
-- `/rss.xml` if blog enabled — `@astrojs/rss`.
-- `robots.txt` allowing all, pointing to sitemap.
-- `manifest.webmanifest` for PWA installability (themeColor from `SITE.seo.themeColor`).
-- NAP (name/address/phone) string stays identical in `SITE`, schema, footer, contact.
+### 8.1 The head, per page
 
-Keyword strategy derives from the brief (see §1) — not from this rule file.
+- `<title>` = page name + titleSuffix, **15–60 chars**, unique per page; description **50–160 chars**,
+  unique, written as the answer a visitor came for — not a keyword list.
+- Exactly one `<h1>`; no skipped heading levels. Gate, not preference.
+- Canonical via `canonicalUrl(path)`, self-referencing, trailing slash, one canonical per page.
+- `<meta name="robots" content="index, follow, max-image-preview:large">` on every indexable page.
+  `noindex` only on 404 and on a staging host (belt: `X-Robots-Tag` in the host config too).
+- OpenGraph + Twitter card, `og:image` 1200×630 with alt, `og:locale`, `og:type`.
+- `hreflang` **only for locales that exist** — a second language that is not built must not emit an
+  alternate pointing at the same URL. When it exists: self + the other locale + `x-default`.
+- `manifest.webmanifest`, favicon set, `theme-color` for both schemes (§0.5.3).
+- JSON-LD `LocalBusiness` (or `Restaurant`, `Store`, `HealthAndBeautyBusiness`, `LodgingBusiness` per
+  brief) via the generator, `BreadcrumbList` on interior pages, `WebSite` on the root.
+- NAP string identical in `SITE`, schema, footer and contact — one source, four renderings.
+
+### 8.2 Crawl and index
+
+- `sitemap-index.xml` via `@astrojs/sitemap`, `lastmod` present, 404 excluded.
+- `robots.txt` allows all, points at the sitemap, absolute URL, no `Disallow` left over from testing.
+- Every page reachable from nav or footer — no orphans, no page only reachable by sitemap.
+- Image sitemap entries when the gallery is a primary asset (`image:image`/`image:loc`).
+- Descriptive image filenames (`villa-anemoossa-sea-view-01.webp`), never `IMG_2041.jpg`.
+- Search Console: verification meta present and **sitemap submitted** before hand-off — in
+  `POST-SETUP.md`, not in a hope.
+- Rich Results Test on the deployed home + one interior page; zero errors, warnings named or fixed.
+
+### 8.3 What we never emit
+
+- `aggregateRating` for self-serving reviews. Google only accepts review markup for reviews about
+  *other* businesses; a taverna marking up its own Google rating is ineligible at best, a spam signal at
+  worst. Ratings appear as visible text with a link to the source (§7.16, §19).
+- Ratings, awards, "as seen in" logos or certification badges the client cannot evidence.
+- Keyword-stuffed alt text, hidden text, doorway pages per locality permutation, or the same intro copy
+  on two pages (thin/duplicate content is a Search Essentials spam policy, not a style nit).
+
+Keyword strategy derives from `RESEARCH.md` (§1) — competitor phrasings, then the client's own words,
+never this rule file.
 
 ---
 
-## 9. Responsive & accessible baseline (every section, every project)
+## 9. Accessibility baseline (every section, every project)
 
-- Mobile-first: every section works at 320 px before being styled up.
-- No horizontal scroll on any viewport (set `html, body { overflow-x: hidden; }`).
-- Tap targets ≥ 44×44 px on touch.
-- All `<img>` have `alt`; decorative SVG tagged `aria-hidden="true"`.
-- Color contrast passes WCAG AA (4.5:1 body, 3:1 large).
-- `prefers-reduced-motion` honoured for every animation.
-- Forms have labels, `aria-required`, error messaging tied to input via `aria-describedby`.
-- Skip-to-content link as first focusable element.
-- Semantic landmarks: `<header>`, `<nav>`, `<main>`, `<footer>`, `<section aria-labelledby>`.
+The floor is WCAG 2.2 AA, and the difference between "axe passes" and "a person can use it" is the
+point of this section. Every item is checked, not assumed.
 
+### 9.1 Layout and reading
+
+- Mobile-first: every section works at 320 px before it is styled up.
+- **No horizontal scroll, and never `html, body { overflow-x: hidden }` to fake it.** `hidden` clips the
+  content past the edge and the visitor cannot reach it; it hides the defect from the screenshot review
+  too. Find the offending element (fixed width, `100vw`, negative margin, untransformed overlay) and fix
+  it. Assert `document.documentElement.scrollWidth <= window.innerWidth` at 320 / 390 / 768 / 1440.
+- No fixed height on anything holding text (buttons, cards, badges) — `min-block-size` plus padding.
+- Layout survives 200 % zoom and a raised browser font size; `rem` for type, never `px` font-size.
+- `user-select: none` only on chrome (drag handles, decorative labels), never on body content.
+- Headings in order, one `<h1>`, and never a heading used for size.
+- Landmarks: `<header>`, `<nav>`, `<main>` (exactly one), `<footer>`, `<section aria-labelledby>`
+  where the section has a heading. Skip link first in the body, visible on focus, targets `<main>`.
+- `scroll-margin-top` on every anchor target (§0.5.3).
+
+### 9.2 Controls and focus
+
+- Tap targets ≥ 44×44 px (Google's floor is 24 — we keep 44 because thumbs).
+- `:focus-visible` styled once in the token layer (§0.5.2), contrast ≥ 3:1 against the adjacent colour.
+  Never `outline: none` without a replacement that measures.
+- No `tabindex` above `0`, ever. `tabindex="0"` only on a non-native control that already carries a role;
+  the real fix is a `<button>` or `<a href>`.
+- Never reorder interactive content with `order`, `row-reverse` or `grid-auto-flow: dense` — visual order
+  and tab order diverge and keyboard users pay for it.
+- Enter/Space handled only where no native element exists; native `<button>`/`<a href>` first.
+
+### 9.3 Text, images, meaning
+
+- Every `<img>` has `alt`; decorative images `alt=""`, decorative inline SVG `aria-hidden="true"`,
+  meaningful inline SVG `role="img"` + `<title>`. No "image of", no keyword stuffing.
+- Colour never carries state alone — pair it with text, icon or shape (error, required, selected, stock
+  status). Same in `forced-colors` mode: any state drawn with `box-shadow`, gradient or background-image
+  disappears there, so give it a border or a glyph.
+- Contrast AA: 4.5:1 body, 3:1 large and for UI edges; check the pair in **both** schemes if a dark
+  palette ships, and re-check text over photography with a scrim, not a hope.
+- Language: `<html lang>` from the route, `lang` on any inline foreign-language passage.
+
+### 9.4 Forms (the part every build gets wrong)
+
+- One `<label for>` per control, hint above the input, both tied with `aria-describedby`.
+- `autocomplete` tokens on every personal field — `name`, `given-name`, `family-name`, `email`, `tel`,
+  `street-address`, `postal-code`, `organization`, `url`. Missing tokens are a WCAG 1.3.5 failure and the
+  mobile keyboard loses its fill button.
+- Correct `type` / `inputmode`: `type="tel"` + `inputmode="tel"` for phone, `type="email"`,
+  `inputmode="numeric"` for a code — `type="number"` loses leading zeros and scrolls the value.
+- Validate on blur or submit, clear the error on input — never announce an error on every keystroke.
+  One polite live region per page carries the message; on success, focus moves to the confirmation and
+  the region announces it.
+- Errors are text next to the field and in the live region, `aria-invalid="true"` only while the message
+  is present.
+- Never disable the submit button as validation (the user cannot see what is wrong). Disable it *after*
+  a successful submit to stop doubles.
+- Never block paste, never block `autocomplete="off"` on contact fields, never auto-submit on change.
+- Honeypot + `reportValidity()` (§0.5.3), never a captcha.
+
+### 9.5 Overlays, motion, media
+
+- Modals and lightboxes are native `<dialog>` + `showModal()` (§7.6b). Anything custom needs `inert` on
+  the outside, `role="dialog"`, focus moved in, focus returned on close.
+- `prefers-reduced-motion` honoured for every animation, including scroll-reveal, parallax and the
+  marquee; the reduced state is the readable state, not a blank page.
+- No autoplaying audio. Video carries `controls` and captions when there is speech; background video is
+  `muted` + `aria-hidden="true"` + a visible pause control.
+- Nothing opens over the content on load — no newsletter modal, no interstitial, no cookie wall when the
+  site truly sets no cookies.
+
+### 9.6 Verification before hand-off
+
+1. `a11y-check.mjs` (axe) passes on every route — it is a floor, not a certificate.
+2. Keyboard pass: tab through the whole page, open and close every overlay with ESC, focus never lost,
+   visible at every stop.
+3. One screen-reader pass (VoiceOver on macOS) over home + the contact form: labels announced, error
+   announced, order sensible.
+4. Zoom to 200 % and 320 px: nothing clipped, nothing overlapped, no two-column squeeze.
+5. Both colour schemes, and `forced-colors: active` emulation: every control still visible and every
+   state still legible.
+
+---
+
+## 9.7 Performance contract — Core Web Vitals, or it did not happen
+
+Google's acceptance bar is **field data at the 75th percentile, mobile**: **LCP ≤ 2.5 s, INP ≤ 200 ms,
+CLS ≤ 0.1**. Lighthouse is a diagnostic that guesses; PageSpeed Insights / CrUX is the verdict. A green
+Lighthouse 90 with a red CrUX is a failing site.
+
+Record in `POST-SETUP.md`: PSI mobile p75 for LCP / INP / CLS on the deployed URL, plus the date. No
+numbers, no hand-off.
+
+### 9.7.1 LCP (loading)
+
+- The hero image is in the raw HTML — `<img>`, not a CSS background, not injected by JS. If it must be a
+  CSS background, preload it: `<link rel="preload" as="image" fetchpriority="high">`.
+- `fetchpriority="high"` on the hero `<img>` and on its preload. Never combined with `loading="lazy"`.
+- `loading="lazy"` for everything below the fold; `fetchpriority="low"` (plus lazy) for media that is
+  above the fold but hidden — carousel slides, mega-menu art, closed dialogs.
+- `srcset` + `sizes` on every content image; hero `sizes="100vw"`, cards their real column width. AVIF
+  with WebP fallback via `<picture>`, never a raw 4 MB JPEG.
+- Hero image budget ≤ 200 KB at 1x, ≤ 400 KB at 2x, correct dimensions in the attributes.
+
+### 9.7.2 Fonts and CSS
+
+- Self-hosted subset `woff2`, `font-display: swap`, and **metric overrides** (`size-adjust`,
+  `ascent-override`, `descent-override`) on the fallback face so the swap does not reflow (§9 CLS).
+- Preload only the two faces used above the fold, always with `crossorigin`; no `fetchpriority="high"` on
+  fonts (they already load high, and preloading weights you do not use starves the hero).
+- No `@import` in CSS — it serialises the critical path. Tailwind v4 already emits one stylesheet.
+- Third-party CSS/JS is deferred and, where possible, interaction-loaded (map on click, video on click,
+  embed behind a facade — §0.5.5).
+
+### 9.7.3 INP (interactivity)
+
+- Any handler that can exceed ~50 ms is sliced; yield with `scheduler.yield()` and fall back to a
+  `setTimeout` promise. Over ~250 ms of work moves off the main thread.
+- `scroll`, `resize`, `pointermove` listeners are passive and rAF-throttled; never one per element when
+  one delegated listener does the job (the parallax + scroll-progress + header-state trio is the usual
+  offender).
+- No layout thrashing: batch reads (`getBoundingClientRect`) then writes (`style.transform`), never
+  interleaved in a loop.
+- Animate `transform`/`opacity` only. `will-change` on a handful of elements, never globally.
+- The mobile menu, accordions and sliders open in one frame — no animation queue that makes the second
+  tap feel dead.
+
+### 9.7.4 CLS (stability)
+
+- `width`/`height` (or `aspect-ratio`) on every image, video, iframe and embed before it loads.
+- Reserve the map slot, the carousel slot and any late-loading banner; never insert content above the
+  fold after paint.
+- Accordion height changes use the grid trick (§7.8), never `max-height` guessing.
+- No `content-visibility` above the fold.
+- Web font swap is covered by metric overrides; no late font substitution in the hero.
+
+### 9.7.5 Long pages, media, caching
+
+- Beyond ~8 sections: `content-visibility: auto` + `contain-intrinsic-size` (with `rem`/`lh` units derived
+  from the content) on below-fold bands, and re-check keyboard reachability afterwards.
+- Video: explicit dimensions, `poster`, `preload="none"`, `loading="lazy"` when offscreen, captions track
+  when there is speech, never autoplay with sound, never a hero video that is also the LCP image.
+- Hashed assets `Cache-Control: public, max-age=31536000, immutable`; HTML short-lived but **not**
+  `no-store` — that kills bfcache. No `unload`/`beforeunload` handlers (§18).
+- `preconnect` only for an origin used above the fold; none if there are no third parties. Optional
+  `prefetch` of the most likely next page on the home page.
+
+### 9.7.6 Weight budget (per page, gzipped)
+
+| Asset | Budget |
+|---|---|
+| HTML | ≤ 50 KB |
+| CSS (all) | ≤ 30 KB |
+| JS initial (before interaction) | ≤ 20 KB |
+| Hero image | ≤ 200 KB (1x) |
+| Everything above the fold, cold load | ≤ 500 KB |
+
+Over budget means naming what grew and why, in one line, before shipping. Not "it's fine on my Mac".
 ---
 
 ## 10. Build & verify gate (before declaring the project done)
@@ -1480,17 +1688,31 @@ POST-SETUP.md (§12) so the human knows what's still pending.
 4. **Design detector** — `npx impeccable detect src/` for the code tells, and
    `npx impeccable detect http://localhost:<port>` against the running server for the
    rendered-only ones (contrast, tiny text, overflow). Exit `2` = findings, `1` = a target could
-   not be scanned. Triage per §7.14: `quality/*` findings are gates, `slop/*` findings are
+   not be scanned. Triage per §7.16: `quality/*` findings are gates, `slop/*` findings are
    defaults to fix or waive in one line with a reason. A clean scan is not proof the page is good —
    the screenshots still decide.
 
-Self-check the agent must run mentally after each section:
-1. Did the build pass?
-2. Does the route open in preview without console errors?
-3. Did every interactive element from §4 get click-tested (all states)?
-4. Did the Lighthouse mobile score land > 90 on Perf/A11y/SEO/Best-Effort? (warn, not block)
-5. Did OG card + canonical + schema render in the page source?
-6. Did every image slot have a real `width`/`height` (grey placeholder OK, broken layout NOT)?
+**Definition of done — the whole list, in this order, before you say "built".**
+
+1. `npm run build` passes with zero errors and zero unhandled warnings.
+2. Every route opens on the built output, zero console errors, zero failed requests on a cold load.
+3. Every interactive element from §4 is click-tested in every state, at 390 and at desktop.
+4. Gates green: `seo-check`, `a11y-check` (axe), `verify-page` (dialog + interactions), layout sweep,
+   `impeccable detect` (§10 items above), and `npm run check:platform` (headers, `max-image-preview`,
+   colour scheme, hero priority, image dimensions, single `h1`, no positive `tabindex`, weight budgets).
+5. **Accessibility manual pass** — §9.6: keyboard through the page, one screen-reader pass, 200 % zoom,
+   both colour schemes, `forced-colors` emulation.
+6. **Headers live** — `curl -sI https://<deployed>/ | grep -i 'strict-transport\|content-security\|referrer\|permissions\|x-content-type'`
+   returns the §18 set. A header file in the repo is not a header on the wire.
+7. **CWV measured** — PSI on the deployed URL, mobile; p75 LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1, numbers
+   pasted in `POST-SETUP.md`. A red field metric blocks hand-off; a yellow Lab score does not.
+8. OG card, canonical, schema and `max-image-preview` render in the page source; Rich Results Test clean.
+9. Every image has real `width`/`height` (grey placeholder fine, broken layout not) and the hero carries
+   `fetchpriority="high"` with no `loading="lazy"`.
+10. Every placeholder, waiver and unverified fact is listed in `POST-SETUP.md` — the count in the audit
+    commands above matches the entries.
+
+A section is "done" when 1–10 hold for it, not when it looks right in one browser window.
 
 ---
 
@@ -1617,9 +1839,26 @@ brief provides the *meaning*.
 - Don't delete or rename conventions this project already established without flagging.
 - Don't ship the reflex AI look — Inter, purple/violet gradient, cream off-white page, gradient
   text, eyebrow kicker above the hero, rounded icon tile above every heading, nested cards,
-  coloured glow (§7.14). Waive one explicitly, in writing, or don't ship it.
+  coloured glow (§7.16). Waive one explicitly, in writing, or don't ship it.
 - Don't pick a display face without a Greek subset for a Greek brief — verify the `.woff2`, don't
   assume (a font's Latin presence says nothing about its Greek coverage).
+- Don't "fix" overflow with `overflow-x: hidden` on `html`/`body`, and don't size a full-width box with
+  `100vw` (it ignores the scrollbar). Fix the element, then assert `scrollWidth === innerWidth` (§9.1).
+- Don't set a `px` font-size, a fixed height on text, or `user-select: none` on content (§9.1).
+- Don't convey state with colour alone, or with `box-shadow`/gradient as the only border — both vanish in
+  forced-colours mode (§9.3).
+- Don't use `tabindex` above `0`, don't reorder interactive content with `order`/`-reverse`/dense grid
+  (§9.2), and don't put a `role="dialog"` on a `<div>` when `<dialog>` exists (§7.6b, §9.5).
+- Don't validate by disabling the submit button, don't announce errors on every keystroke, don't block
+  paste, don't omit `autocomplete` tokens (§9.4).
+- Don't open anything over the content on load — no newsletter modal, no interstitial, no cookie banner
+  for a site that sets no cookies (§9.5, Google page-experience).
+- Don't autoplay audio or video with sound, and don't use a hero video that is also the LCP element (§9.7).
+- Don't ship `Cache-Control: no-store` on HTML, or an `unload` handler — both kill bfcache (§9.7, §18).
+- Don't assign user or CMS data with `innerHTML`; `textContent` or `setHTML()` (§18).
+- Don't emit `aggregateRating` for the client's own reviews, or any award/badge they cannot evidence (§8.3).
+- Don't put a fake trust strip (Google logo + five stars + "trusted by our customers") on a site with no
+  linked, real reviews. It is a claim, and it is the first thing a client is asked to justify (§19).
 
 ---
 
@@ -1628,7 +1867,11 @@ brief provides the *meaning*.
 | If the brief asks for… | Default |
 |---|---|
 | "a map" | OpenStreetMap embed (privacy, no API key) |
-| "a gallery" | Responsive grid + GLightbox |
+| "a gallery" | Responsive grid + native `<dialog>` lightbox (§7.6b); external library only for pinch-zoom |
+| "a video" | poster + `preload="none"` + dimensions + lazy when offscreen; never a hero that competes with the LCP image |
+| "dark mode" | Only if the brief asks. Always ship `color-scheme` + two `theme-color` values; a second palette is a design decision, not a default |
+| "a long page" (>8 sections) | `content-visibility: auto` + `contain-intrinsic-size` on below-fold bands, keyboard re-checked |
+| "a form" | Labels + `autocomplete` tokens + one polite live region + honeypot; validate on blur, never a disabled button |
 | "testimonials" | Swiper slider + star svgs |
 | "FAQ" | Accordion (grid trick), single-open |
 | "booking" | External link / mailto / Formspree — never invent a fake calendar |
@@ -1640,10 +1883,111 @@ brief provides the *meaning*.
 | "blog comments" | Out of scope |
 | "newsletter" | Plain mailto or Formspree → email list provider (e.g. Buttondown) |
 | "share buttons" | Static anchor links (FB/X/LinkedIn share URLs) — no SDK |
-| "a hero" | one anchor image + a headline that carries itself — no eyebrow, no pill, no gradient (§7.14) |
-| "a font" / no preference | Manrope (starter default); otherwise the §7.14 shortlist, Greek subset verified |
+| "a hero" | one anchor image + a headline that carries itself — no eyebrow, no pill, no gradient (§7.16) |
+| "a font" / no preference | Manrope (starter default); otherwise the §7.16 shortlist, Greek subset verified |
 | "make it pop" / "more premium" | name the move (bolder / quieter / typeset) and one target — never restyle the whole page |
 | "make it look like <competitor>" | copy the structure and the information order, never the palette, type or tells |
+
+---
+
+## 18. Security, headers and hosting
+
+A static brochure site has almost no attack surface, and almost every build still ships none of the
+five-minute defences. All of these live in a host config file, not in code.
+
+### 18.1 The header set — every site, every host
+
+| Header | Value | Why |
+|---|---|---|
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` | pins HTTPS after the first visit |
+| `X-Content-Type-Options` | `nosniff` | stops MIME sniffing on uploads and proxied assets |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | no path leakage to third parties |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` — open one only if the brief needs it | nothing gets silently requested |
+| `Content-Security-Policy` | see below | the only real XSS backstop |
+| `Content-Security-Policy: frame-ancestors 'none'` | part of the same header | clickjacking; drop to `'self'` only for a deliberate embed |
+| `Cache-Control` | hashed assets `public, max-age=31536000, immutable`; HTML `public, max-age=0, must-revalidate` | fast reloads, instant deploys, bfcache kept alive |
+
+Where the file goes: `public/_headers` for Netlify and Cloudflare Pages (shipped by the starter),
+`vercel.json` for Vercel, `.htaccess` for Apache/cPanel hosts. Pick the one for the host the client pays
+for and delete the others from the build so nobody debugs a header that never applied.
+
+### 18.2 CSP for a static Astro site
+
+Start here, then tighten:
+
+```
+default-src 'self';
+script-src 'self' 'unsafe-inline';
+style-src 'self' 'unsafe-inline';
+img-src 'self' data: blob: https:;
+font-src 'self';
+frame-src https://www.openstreetmap.org https://www.google.com;
+form-action 'self' https://formspree.io https://api.web3forms.com;
+frame-ancestors 'none';
+base-uri 'none';
+object-src 'none';
+```
+
+- `'unsafe-inline'` for script and style is the honest starting point for Astro's inline islands and
+  Tailwind's inline styles. Once the page's inline scripts stop changing, replace it with their SHA-256
+  hashes — then the policy actually blocks injected script.
+- `frame-src` lists the map provider the brief chose, nothing else. Adding an embed means adding an
+  origin and saying so.
+- `form-action` lists the form endpoint. A CSP that allows everything is decoration, and a CSP that
+  allows nothing breaks the contact form on the client's first day.
+- Third-party script (analytics, widget): self-host it, or pin it with `integrity` + `crossorigin` (§18.4).
+
+### 18.3 Code hygiene
+
+- `innerHTML` only with a constant string; user, CMS or API content goes through `textContent`,
+  `replaceChildren()` or `setHTML()`.
+- No `eval`, no `new Function`, no `document.write`, no inline `onclick=`.
+- No secrets in the client bundle: form endpoints are public by design, API keys are not. An Unsplash key
+  or a Maps key that must ship is restricted by referrer in the provider console and named in
+  `POST-SETUP.md`.
+- Staging and preview hosts send `X-Robots-Tag: noindex` and a `robots.txt` that disallows everything.
+
+### 18.4 Third parties, kept honest
+
+- Every external `<script>`/`<link rel=stylesheet>` is pinned with `integrity` + `crossorigin`, or
+  self-hosted. A CDN URL that silently changes content is a supply-chain hole.
+- Maps, video and embeds behind a click-to-load facade (§0.5.5) — better privacy *and* better LCP.
+- One line per third party in `POST-SETUP.md`: what it is, who receives data, how to remove it.
+
+---
+
+## 19. Content quality floor (people-first, or the SEO is theatre)
+
+Google's guidelines are explicit that technical perfection does not rescue thin or untrustworthy content.
+This section is the part a design checklist cannot cover.
+
+### 19.1 Every page earns its existence
+
+- A page exists because a visitor needs it, not because a keyword cluster wanted it. One page per real
+  service, real room type, real trip, real place served.
+- **No doorway pages.** Ten near-identical "villa in <beach name>" pages are a spam-policy violation.
+  One page listing the areas served beats nine thin ones.
+- No duplicate intros across pages; each page's first 100 words answer a different question.
+- Seasonal and factual content carries its verification date (`Prices correct for the 2027 season`),
+  and the same date goes in `POST-SETUP.md`.
+
+### 19.2 Trust signals must be real
+
+- Reviews: visible text plus a link to the source. Never `aggregateRating` for the business's own reviews
+  (§8.3). Never a rating on a page that cannot link to it.
+- Names, faces and facts: the family that runs it, the year it opened, the address that appears on the
+  map. A brochure site's advantage over an OTA is that a human is behind it — show that human.
+- Photography: the client's own photos first, commissioned second, stock last and credited. A tourism
+  site with generic stock of "a Mediterranean beach" is indistinguishable from the 200 sites above it.
+- No invented certifications, awards, "as featured in" logos, VAT numbers, DPO or insurance claims.
+
+### 19.3 Copy
+
+- Written for a person deciding whether to book: what it is, where exactly, what it costs, what happens
+  next, who to ask.
+- Competitor phrasings from `RESEARCH.md` are used to *match the words people search*, never to pad.
+- The buzzword and cadence bans from §7.16 apply to every page, including the meta description.
+- The Greek version or the English version. Never machine-translated leftovers in production (§0.5.4).
 
 ---
 

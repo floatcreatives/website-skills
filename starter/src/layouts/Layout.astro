@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { SITE, generateBusinessSchema, generateWebsiteSchema } from '../data/site.config';
+import { SITE, canonicalUrlForLocale, generateBusinessSchema, generateWebsiteSchema } from '../data/site.config';
 
 export interface Props {
   title: string;
@@ -12,7 +12,8 @@ export interface Props {
 
 const { title, description, canonical, ogImage, robots } = Astro.props;
 const imageUrl = ogImage || SITE.seo.defaultOGImage;
-const robotsMeta = robots || "index, follow";
+const robotsMeta = robots || "index, follow, max-image-preview:large";
+const alternateLocales = SITE.alternateLocales ?? [];
 const isHomepage = canonical === `${SITE.url}/`;
 
 const businessSchema = generateBusinessSchema();
@@ -20,11 +21,13 @@ const websiteSchema = generateWebsiteSchema();
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang={SITE.language}>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content={SITE.seo.themeColor}>
+  <meta name="theme-color" content={SITE.seo.themeColor} media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content={SITE.seo.themeColorDark ?? SITE.seo.themeColor} media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light">
   <title>{title}</title>
   {description && <meta name="description" content={description}>}
   <meta name="robots" content={robotsMeta}>
@@ -54,10 +57,13 @@ const websiteSchema = generateWebsiteSchema();
   {description && <meta name="twitter:description" content={description}>}
   <meta name="twitter:image" content={imageUrl}>
 
-  <!-- Hreflang alternates -->
-  {canonical && <link rel="alternate" href={canonical} hreflang="en">}
-  {canonical && <link rel="alternate" href={canonical} hreflang="el">}
-  {canonical && <link rel="alternate" href={canonical} hreflang="x-default">}
+  <!-- Hreflang: self + x-default only, until a second locale is actually built.
+       An alternate pointing at the same URL is a Search Console error, not a feature. -->
+  {canonical && alternateLocales.length > 0 && <link rel="alternate" href={canonical} hreflang={SITE.language}>}
+  {canonical && alternateLocales.map((locale) => (
+    <link rel="alternate" href={canonicalUrlForLocale(locale, Astro.url.pathname)} hreflang={locale} />
+  ))}
+  {canonical && alternateLocales.length > 0 && <link rel="alternate" href={canonical} hreflang="x-default">}
   
   <!-- Structured Data -->
   <script type="application/ld+json" set:html={JSON.stringify(businessSchema)}></script>
@@ -67,7 +73,6 @@ const websiteSchema = generateWebsiteSchema();
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
   <link rel="manifest" href="/manifest.json">
   
-  <!-- Preload self-hosted Inter fonts (critical for FCP/LCP) -->
 </head>
 <body class="bg-white">
   <!-- Skip to content -->
@@ -132,16 +137,8 @@ const websiteSchema = generateWebsiteSchema();
         parallaxImages.forEach(img => {
           const rect = img.parentElement.getBoundingClientRect();
           if (rect.bottom > 0 && rect.top < window.innerHeight) {
-            const speed = 0.15;
-            const offset = (rect.top * speed);
-            const isInView = rect.top < window.innerHeight && rect.bottom > 0;
-            // Only apply ken-burns to the first (hero) image
-            const isHero = img.closest('section')?.classList.contains('min-h-screen');
-            if (isHero && isInView) {
-              img.style.transform = `translate3d(0, ${offset}px, 0) scale(1.1)`;
-            } else {
-              img.style.transform = `translate3d(0, ${offset}px, 0) scale(1.1)`;
-            }
+            const offset = rect.top * 0.15;
+            img.style.transform = `translate3d(0, ${offset}px, 0) scale(1.1)`;
           }
         });
         ticking = false;
@@ -151,7 +148,7 @@ const websiteSchema = generateWebsiteSchema();
           window.requestAnimationFrame(updateParallax);
           ticking = true;
         }
-      });
+      }, { passive: true });
       updateParallax();
     }
 
@@ -182,7 +179,7 @@ const websiteSchema = generateWebsiteSchema();
           window.requestAnimationFrame(update);
           ticking = true;
         }
-      });
+      }, { passive: true });
 
       if (backToTop) {
         backToTop.addEventListener('click', () => {

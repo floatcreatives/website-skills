@@ -13,6 +13,9 @@ export const SITE = {
   url: "https://yourdomain.com",
   language: "en",
   locale: "en_US",
+  // Locales that are actually built and live, e.g. ["el"]. Empty = single-language site,
+  // and no hreflang alternate is emitted. Add the locale only when /<locale>/ pages exist.
+  alternateLocales: [] as string[],
 
   // ── Google Search Console ──────────────────────────────────────
   // Get this from: Google Search Console → Settings → Verification
@@ -72,6 +75,8 @@ export const SITE = {
     ogImageHeight: 630,
     twitterHandle: "@yourbusiness",
     themeColor: "#333333",
+    // Dark-scheme chrome colour. Keep equal to themeColor unless the site really has a dark palette.
+    themeColorDark: "#111111",
     author: "Your Business",
   },
 
@@ -251,4 +256,10 @@ export function generateBreadcrumbSchema(
 export function canonicalUrl(path: string): string {
   const normalized = path.endsWith("/") ? path : `${path}/`;
   return normalized === "/" ? `${SITE.url}/` : `${SITE.url}${normalized}`;
+}
+
+/** Absolute URL of the same page in another locale, for hreflang. */
+export function canonicalUrlForLocale(locale: string, path: string): string {
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return canonicalUrl(`/${locale}${normalized}`);
 }

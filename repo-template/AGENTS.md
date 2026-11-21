@@ -21,6 +21,21 @@ Read those before making changes. This file only covers rules local to this repo
 
 ---
 
+## Browser support, stated once
+
+**Baseline Widely available** is the target: every CSS/JS feature used must be Baseline *widely* available
+(30 months past interoperable) or carry an explicit fallback. No polyfills without a stated reason.
+Newer features are allowed only feature-detected, with the fallback written in the same commit. Record any
+exception here, with the reason.
+
+## Documents this repo carries
+
+| File | What it holds |
+|---|---|
+| `RESEARCH.md` | Niche + competitor pass from §1 Phase A.5 — table stakes, the wedge, competitor keyword phrasings |
+| `POST-SETUP.md` | Human tasks, placeholders, CWV numbers, header verification, form endpoints |
+| `AGENTS.md` | This file — browser policy and local rules only |
+
 ## This project
 
 | | |
