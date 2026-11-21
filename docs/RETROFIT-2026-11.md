@@ -77,14 +77,28 @@ Real WCAG 1.3.5 / 4.1.3 failures, and the fix is attributes, not markup surgery.
 5. Honeypot present, `reportValidity()` called, labels tied with `for`/`id` and hints via
    `aria-describedby`.
 
-### Batch 3 — overlays on `<dialog>` (12 repos, ~30–40 min each)
+### Batch 3 — overlays on `<dialog>` (12 repos, ~15–25 min each after 1.3.1)
 
-The only item that touches markup, so it gets its own batch and its own gate.
+The only item that touches markup, so it gets its own batch and its own gate. Since 1.3.1 there is a
+reference implementation, which halves the work: copy `starter/src/components/Lightbox.astro` instead of
+writing the overlay again.
 
-1. `<div role="dialog">` + manual focus trap → `<dialog>` + `showModal()`; `.close()` on ESC is free.
-2. Move styles from the old overlay root to `dialog::backdrop` + `dialog[open]`.
-3. Re-test with `verify-page.cjs` (it asserts `dialog[open]`) plus a manual keyboard pass: open, tab
-   inside, ESC, focus returned to the trigger.
+1. Replace the existing overlay root with that component (same visual design: counter, caption, thumbs,
+   arrows, close). Keep the project's classes, take the markup and the script.
+2. Convert the openers to real buttons: `<div class="js-gallery-item">` → `<button type="button"
+   data-lightbox data-index="0">`. The gate clicks `[data-lightbox]`; a div leaves keyboard users nothing.
+3. Move the overlay styles from the old root to `dialog.lightbox-overlay`, `::backdrop` and `[open]`;
+   delete the `.active` class rules.
+4. Re-test with `verify-page.cjs` (it asserts `dialog[open]`) plus a manual pass: open, tab inside, ESC,
+   focus returned to the trigger, backdrop click closes, the image click does not.
+
+**Three sites are not the same job:**
+
+| Site | State | Work |
+|---|---|---|
+| `lpl-cars` | overlay markup exists, **no script opens it** — the gallery is dead | take the component and the openers; this one is a bug fix, not a refactor |
+| `alexandras-villas`, `rooms-skiathos` | no lightbox at all | add the component, or decide the grid is the gallery and document the choice |
+| the other 12 | working div overlays | the four steps above |
 
 Do the two live, client-facing sites first (`bluehorizon`, `atletico-skiathos`), then the rest.
 
@@ -126,13 +140,26 @@ Do the two live, client-facing sites first (`bluehorizon`, `atletico-skiathos`),
 |---|---|---|
 | 1 | all 17 | 2–3 h |
 | 2 | 11 repos | ~4 h |
-| 3 | 12 repos | 6–8 h |
+| 3 | 12 repos (component now exists) | 3–5 h |
 | 4 | 10 repos | ~2 h |
 | 5 | deployed sites | ~2 h |
-| **Total** | | **≈ 2 focused days** |
+| **Total** | | **≈ 1.5 focused days** |
 
 ## Tracking
 
 Add one checkbox block per repo to `float-devops` (or this file) with the five batch rows; tick only when
 the acceptance gate ran on that repo. A repo with green batches 1–2 is already ahead of 90 % of the
 websites competing with these clients.
+
+---
+
+## Addendum — what 1.3.1 changed for this plan
+
+- **Batch 3 got cheaper and safer.** `starter/src/components/Lightbox.astro` is a working native-`<dialog>`
+  gallery (open, next, prev, thumbs, arrow keys, ESC, backdrop, swipe, focus return). Copy it. The old
+  starter overlay was markup with no script — do not copy that shape into another repo.
+- **`npm run check:platform`** now exists; add it to each site's `scripts/` and run it after every batch.
+  It fails on a lazy hero, missing dimensions, a missing header policy, missing `max-image-preview`, a
+  second `h1`, positive `tabindex`, and images over 400 KB.
+- **Courses of action that no longer apply:** adding GLightbox or Swiper's lightbox module. One `<dialog>`,
+  zero dependencies.
