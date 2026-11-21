@@ -35,13 +35,24 @@ copy.
 
 ## 4. Stale local rule copies — fixed 2026-11
 
-The copy previously named here (`~/.hermes/skills/software-development/brochure-website-astro-tailwind/`)
-no longer exists. The local agent skill is now `float-website-skills`, deliberately named after
-this repo, and its frontmatter `version:` must equal the root `VERSION` file. When the rules change
-here, bump `VERSION` and the skill's `version:` in the same change — otherwise a machine silently
-builds against an older contract, which is exactly the drift gap 3 describes.
+**Resolved 2026-11-16.** The copy previously named here
+(`~/.hermes/skills/software-development/brochure-website-astro-tailwind/`) no longer exists, and no stale
+`BROCHURE-SITE-RULES.md` copy remains under `~/.hermes/skills`. The live skill is
+`~/.hermes/skills/web/float-website-skills` — deliberately named after this repo, bumped to 1.2.1 with
+this change (§0.5 default kit + `references/i18n-bilingual.md`) — and it reads this repo for anything it
+does not carry. Its frontmatter `version:` must equal the root `VERSION` file: when the rules change here,
+bump `VERSION` and the skill's `version:` in the same change, otherwise a machine silently builds against
+an older contract, which is exactly the drift gap 3 describes.
 
-## 5. The starter does not yet pass its own §7.14 detector gate
+## 5. Superseded repos
+
+- `CubeSeven/astro-website-base-template` (`square-series`) — an unused redesign
+  experiment: no Tailwind, no Swiper, own `src/ui/sections` block library.
+  **Zero client projects ever used it.** Archived 2026-10-22.
+- `CubeSeven/float-skills`, `CubeSeven/astro-business-template` — superseded by
+  this repo.
+
+## 6. The starter does not yet pass its own §7.14 detector gate
 
 `npx impeccable detect dist/` on the freshly built starter reports **55 findings**, which means
 every new project inherits them. Fixed in the same change that added the gate: two low-contrast
@@ -62,3 +73,20 @@ What is left, and why it is a gap rather than a bug list:
 
 Until this passes, state the count when handing a project over rather than reporting the gate as
 clean.
+
+## 7. `starter/` does not yet carry the §0.5 kit
+
+§0.5 (added 2026-11-16) makes these mandatory on every build, and the starter still ships none of them:
+
+- **No `src/i18n/` scaffold.** §0.5.4 wants a typed dictionary with `en.ts` stubbed against `Dict`, so a
+  second language is one file. Every project currently invents its own shape, which is how the seam gets
+  skipped.
+- **No `scripts/check-third-party.mjs`.** §0.5.5 claims "no cookies, no banner" and that claim is only
+  gated if the checker runs in `npm run build`. The script exists in the Hermes skill
+  (`float-website-skills`) and needs to move here as the canonical copy.
+- **No `public/robots.txt`** with a sitemap line, and `sitemap()` is called without the `i18n` block that
+  §0.5.4 requires once a second locale exists.
+- **No skip link / `<main id="main">`** and no `scroll-margin-top` on anchor targets (§0.5.3).
+
+Decision needed: fold these into the starter (one commit, then re-verify the build), or leave the rules
+ahead of the starter and say so here until someone does. The rules lead; the starter does not follow yet.

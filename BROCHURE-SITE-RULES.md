@@ -16,10 +16,10 @@
 
 ## 0. What this file is
 
-> **VERSION: 1.2.0** — bump this number with every change to these rules, and bump the local
+> **VERSION: 1.2.1** — bump this number with every change to these rules, and bump the local
 > agent skill `float-website-skills` (`version:` in its frontmatter) to the same number in the same
-> change. One name, one version: `float-website-skills` v1.2.0 == `BROCHURE-SITE-RULES.md`
-> 1.2.0. The root `VERSION` file carries the same string.
+> change. One name, one version: `float-website-skills` v1.2.1 == `BROCHURE-SITE-RULES.md`
+> 1.2.1. The root `VERSION` file carries the same string.
 
 A portable contract for building **static brochure websites** (Astro + Tailwind CSS v4).
 Target projects: local businesses, restaurants, clinics, shops, villas, studios,
@@ -41,7 +41,105 @@ but the agent should flag the conflict and ask before deviating.
 
 ---
 
+## 0.5 The default kit — blocks, styles, language seam, privacy floor (read before §1)
+
+Every Float site ships these, new design or legacy migration. Each one is asked for by name on real
+projects, and each one delivered late costs a correction round instead of a decision. Read this before
+scaffolding: it decides what the build contains, not just how it looks.
+
+### 0.5.1 Blocks
+
+| Block | Spec | Proof before hand-off |
+|---|---|---|
+| Header with scroll state | §4, §7 | measured at 0 / just-past-threshold / deep scroll |
+| Full-screen mobile menu | §4, §7.7 | open state captured at 390, close control visible, ESC + both scroll roots locked |
+| Hero scrim + open-now status line | §4, §7 | computed open/closed state asserted, not the label |
+| Text and image reveals | §4, §7.10 | every `[data-reveal]` animated after a full scroll, zero stuck |
+| Hover floor on every control | §7.14 | lift + icon nudge, nav underline, card zoom ~3%, focus ring, lightbox fade |
+| Parallax on every full-bleed band | §4, §7.10 | band captured, `scrollWidth - innerWidth === 0` |
+| Gallery / rail with lightbox | §4, §7.5 | counter, arrows, ESC, swipe, focus return |
+| Reviews rail (CSS scroll-snap) | §7.6 | manual swipe keeps the counter in sync |
+| FAQ accordion | §4 | panel height 0 → N px, panel resolved via `aria-controls` |
+| Sticky mobile action bar | §4, §7.7 | `body` reserves the bar height, last line not covered at 390 |
+| Map block | §4 | tiles render, a placeholder hint shows before init |
+| Booking / contact form | §4, §7.13 | both composed URLs readable from `form.dataset.*` |
+| Privacy page + real 404 | §8, §12 | footer link resolves, host serves the 404 |
+| `og:image` 1200×630, favicon, touch icon | §8 | file existence asserted by the SEO gate |
+| SEO, a11y and interaction gates | §8, §9, §10 | green **before** the repo is created |
+
+### 0.5.2 Design base — declare these once, before the first section
+
+`global.css` opens with one block of values; no section below it invents its own. This is what stops a
+page where each section picked a different radius, easing and heading size.
+
+| Token | Values |
+|---|---|
+| Section rhythm | three sizes only: `--pad-y: clamp(4rem, 9vw, 7rem)` (band), `--pad-y-sm: clamp(2.5rem, 5vw, 4rem)` (strip), `--gap: clamp(1rem, 2vw, 1.5rem)` (grid) |
+| Type scale | `--t-display: clamp(2.6rem, 7vw, 5.5rem)`, `--t-h2: clamp(1.9rem, 3.4vw, 3rem)`, `--t-h3: 1.15–1.35rem`, `--t-body: 1rem/1.65`, `--t-micro: .72rem` caps + `.14em` tracking. No size between steps. |
+| Measure | body `65ch`, lead `50ch`; never a `ch` measure on an element that does not carry the display font |
+| Radius | one decision per site: `0` (sharp/editorial) or one soft step (12–16px); never mixed |
+| Motion | `--dur-1: 180ms` (hover), `--dur-2: 420ms` (reveal), `--dur-3: 700ms` (band); one easing `cubic-bezier(.22,.61,.36,1)`; no bounce |
+| Focus | `:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px }`, styled once for every control |
+| Icons | one set, one stroke width (1.5), two sizes (18 nav / 20 CTA); never two sets |
+
+Primitives every section composes, so a bespoke value in a section is a bug: `.btn` (solid / outline /
+text, hover lift with icon nudge), `.eyebrow` (caps micro, one fact only), `.rule` (1px hairline
+separator, the alternative to another card), `.grid-num` (numbered editorial grid on hairlines, the card
+reflex killer), `.field` (label + input + focus ring + error state).
+
+### 0.5.3 The floor — small things every site needs and most builds forget
+
+- **Skip link + one `<main id="main">`**, first in the body, visible on focus.
+- **`scroll-margin-top` on every anchor target** (`calc(var(--header-h) + 1rem)`), never a JS offset.
+- **`theme-color`, `<html lang>`, `og:locale`** on every page.
+- **Phone digits normalised once** in the site config: `tel:` takes the display form, `wa.me` takes
+  digits only with no `+`.
+- **Honeypot + `reportValidity()` on every form, never a captcha.** A static site cannot validate on the
+  server; say so rather than implying it.
+- **`robots.txt` with the sitemap line**, and `lastmod` in the sitemap.
+- **A loading screen only when the hero is heavy**, opt-in, removed on `load`, never a condition for the
+  content to exist.
+
+### 0.5.4 Bilingual-ready from day one
+
+Every build ships the seam for a second language even when only one is live. Bilingual is a seasonal
+request that arrives mid-season, and by then it must cost one file, not a rewrite. Full recipe, folder
+layout and the flip-on checklist: `docs/I18N-AND-PRIVACY.md`.
+
+- Root is the default language, the second sits at `/<lang>/…`, same slug structure, and `<html lang>`
+  comes from the route rather than a constant.
+- All copy lives in `src/i18n/<lang>.ts`, with the dictionary type derived from the default file, so a new
+  key fails the build until the other language has it. NAP, hours, geo and socials stay language-neutral
+  in `site.config.ts`. This is the same rule as §6 (nothing a visitor reads sits in a component).
+- Every page emits `hreflang` (including `x-default`) and `og:locale`; the sitemap lists both languages;
+  canonical is self-referencing per language, never cross-language.
+- The language switcher ships **hidden** until the second dictionary is complete. A switcher into
+  half-translated pages is worse than no switcher, and it is the version that ships when nobody gates it.
+- The second language is written, not translated sentence by sentence; trade and product terms stay
+  English, brand names stay as they are.
+
+### 0.5.5 GDPR floor
+
+Default position: the site stores nothing, so it needs no cookie banner. That is true only while
+everything below holds, and it is enforced by a build gate (§0.5.1, `scripts/check-third-party.mjs`), not
+by memory. Clause list, art. 13 sections and operator wording: `docs/I18N-AND-PRIVACY.md` and §12.
+
+- Self-hosted fonts, Leaflet + OSM instead of a Google Maps iframe, no YouTube/Vimeo/Instagram embed
+  unless behind a click-to-load facade that fetches only on click.
+- Cookieless analytics only, if the owner wants numbers: Cloudflare Web Analytics or a self-hosted
+  Plausible. No Google Analytics, no tag manager, no ad pixels, no session recording, no heatmaps.
+- The privacy page is written from the built HTML: name the host logs, the mail client and the analytics
+  provider, and delete every claim the build cannot support.
+- Forms carry a consent sentence naming purpose and retention plus a `/privacy/` link. WhatsApp is Meta:
+  a `wa.me` submission transfers the visitor's details to a third party, so say it and offer email as the
+  alternative.
+- Never invent VAT numbers, a DPO, retention periods or a legal basis. Omit the line and mark it
+  owner-confirm in `POST-SETUP.md` (§12).
+
+---
+
 ## 1. Project kickoff protocol (run automatically on first task)
+
 
 Before any code is written or files are created, the agent **MUST** run this interview.
 Skip any phase the user already answered in their initial brief/design drop.
