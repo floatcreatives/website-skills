@@ -16,10 +16,10 @@
 
 ## 0. What this file is
 
-> **VERSION: 1.3.0** — bump this number with every change to these rules, and bump the local
+> **VERSION: 1.3.1** — bump this number with every change to these rules, and bump the local
 > agent skill `float-website-skills` (`version:` in its frontmatter) to the same number in the same
-> change. One name, one version: `float-website-skills` v1.3.0 == `BROCHURE-SITE-RULES.md`
-> 1.3.0. The root `VERSION` file carries the same string.
+> change. One name, one version: `float-website-skills` v1.3.1 == `BROCHURE-SITE-RULES.md`
+> 1.3.1. The root `VERSION` file carries the same string.
 
 A portable contract for building **static brochure websites** (Astro + Tailwind CSS v4).
 Target projects: local businesses, restaurants, clinics, shops, villas, studios,
@@ -227,6 +227,36 @@ best local site, not the average one. Time-box: 25 minutes. Output: `RESEARCH.md
 - If a competitor blocks or is unreachable, say so and move on. Never write a research section from
   memory of what tourism sites usually contain — that is how the generic build gets made.
 
+### Phase A.6 — Art direction brief (the part that decides whether it looks like anything)
+
+The competitor pass says what must exist. This step decides what the page *is*, in eight lines, before a
+single component is written. It is the difference between a site with good rules applied and a site with a
+point of view. Record it at the top of `RESEARCH.md` — and if any answer is "whatever the starter does",
+the build is a template and the owner will say so.
+
+| Decision | What "good" looks like |
+|---|---|
+| **Anchor** | One image or one fact the page is built around, named. Not "the hero photo" — *that* photo, and why it beats the other five. |
+| **One signature move** | One thing a visitor remembers: a full-bleed band, a 40/60 split that repeats, a numbered index of the rooms, a single loud colour used once. One, not five. |
+| **Type** | A display face + a text face with a reason attached (era, place, trade), both Greek-verified (§7.16), sizes from §0.5.2 only. |
+| **Palette** | Three values from the place itself (stone, sea, olive, sign paint) — not from a colour generator, not the purple gradient. |
+| **Composition** | Which two section shapes carry the page: hairline grid, band, asymmetric split, editorial stack. Chosen before the first section, then reused. |
+| **Density** | Small-screen-first decision: is this page quiet and airy or dense and informative? A taverna menu and a villa both lose if they get the other one. |
+| **Photography treatment** | Crop ratio, treatment (full colour / one duotone band), and whether type sits on the image or beside it. Never both on one page. |
+| **The anti-slop check** | Read §7.16's never-by-default list out loud against the plan. Every hit is removed now, not waived later. |
+
+**Rules**
+
+- **Decisions are made before layout, not discovered during it.** An agent that starts a hero and "sees how
+  it feels" ships the default.
+- **The signature move is allowed to be quiet.** One perfect band beats five effects; motion is a decision
+  from §0.5.2's durations, never an added library.
+- **Owner-supplied art wins.** If the client sends a photo or a logo, the anchor changes to it — the brief
+  adapts, the rules do not bend (§14).
+- **Write the two lines you will be judged by**: "this page is about X" and "the one thing you remember is
+  Y". If they are not in `RESEARCH.md`, the build has no thesis.
+
+---
 ### Phase B — Business facts
 - Phone (display + raw), email, WhatsApp number
 - Full street address (street, locality, region, postal, country)
@@ -312,7 +342,7 @@ Always: document *why* in one line, verify it works with Astro static output, en
 
 Pre-approved usual suspects (agent can pick without re-asking):
 - **Leaflet + OpenStreetMap** for maps (replace Google Maps embed if privacy/offline matters)
-- **GLightbox / spot-lightbox / swiper lightbox module** for galleries
+- **A lightbox library** — only for pinch-zoom/pan; the overlay stays a `<dialog>` (§7.6)
 - **Framer Motion** only inside hydrated framework islands; for pure static,
   prefer vanilla `IntersectionObserver` (see §7 patterns)
 - **Web3Forms / Formspree / Netlify Forms** for contact forms (no backend)
@@ -595,286 +625,118 @@ import 'swiper/css/pagination';
 Wrap autoplay init in a `matchMedia('(prefers-reduced-motion: no-preference)')` check,
 otherwise leave the slider static (still scrollable).
 
-### 7.6 Lightbox patterns
+### 7.6 Lightbox — native `<dialog>`, no library
 
-Two options — pick based on gallery size and feature needs. Both are tested and work
-on first build.
+One pattern, every gallery, any size. `<dialog>` + `showModal()` gives the focus trap, `inert` background,
+top layer, ESC and focus return for free; a `<div role="dialog">` reimplements all five and gets three of
+them wrong (§4.2, §9.5). The verify gate asserts `dialog[open]` — this is the only shape that passes.
 
-**Decision:** vanilla (7.6b) for <20 images. GLightbox (7.6a) if you need touch-swipe,
-zoom, video embeds, or galleries >20 images.
-
-#### 7.6a GLightbox (external library)
-
-```astro
----
-import 'glightbox/dist/css/glightbox.min.css';
----
-<a href={img.full} class="glightbox" data-gallery="gallery" data-title={img.alt}>
-  <img src={img.thumb} alt={img.alt} loading="lazy" width={img.w} height={img.h} />
-</a>
-<script>
-  import GLightbox from 'glightbox/dist/js/glightbox.min.js';
-  const lb = GLightbox({ selector: '.glightbox', touchNavigation: true, loop: true });
-  // ESC, overlay-click, swipe already built in
-</script>
-```
-
-#### 7.6b Vanilla zero-dependency lightbox (recommended default)
-
-Prefer this for most brochure galleries — no npm dependency, ~80 lines of JS,
-full keyboard + mouse + touch support. Tested across every brochure site built
-from this rule file.
-
-**Critical CSS warning — must read before implementing:**
-
-Astro scopes `<style>` tags inside `.astro` components by appending a hash to class
-names. If the lightbox overlay is rendered in markup (or created by JS and appended
-to `document.body`), it sits outside the component's scoped DOM tree — scoped CSS
-rules **will not match** the overlay elements. The overlay will exist in the DOM but
-stay invisible (`opacity:0; visibility:hidden`) with no way to toggle it.
-
-**The fix:** lightbox overlay styles MUST live in `src/styles/global.css` (or any
-non-scoped `.css` file imported as a module). Component-local `<style>` tags are
-only safe for styles that apply to elements *inside* the component's own rendered
-output (e.g., the gallery grid, the thumbnail strip scrollbar). The overlay itself
-(visibility, opacity, image transition, caption transition) goes in global CSS.
-
-**Step 1 — Global CSS** (`src/styles/global.css`):
+**Global CSS** (`src/styles/global.css`) — the overlay is not a component-scoped element, so its rules
+live here (§7.1):
 
 ```css
-.lightbox-overlay {
-  transition: opacity 0.35s ease, visibility 0.35s ease;
-  opacity: 0;
-  visibility: hidden;
+dialog.lightbox {
+  border: 0; padding: 0; margin: 0;
+  max-width: none; max-height: none;
+  width: 100%; height: 100%;
+  background: transparent;
+  color: inherit;
 }
-.lightbox-overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-.lightbox-image {
-  transition: opacity 0.35s ease, transform 0.35s ease;
-  opacity: 0;
-  transform: scale(0.92);
-}
-.lightbox-overlay.active .lightbox-image {
-  opacity: 1;
-  transform: scale(1);
-}
-.lightbox-caption {
-  transition: opacity 0.4s ease 0.1s, transform 0.4s ease 0.1s;
-  opacity: 0;
-  transform: translateY(10px);
-}
-.lightbox-overlay.active .lightbox-caption {
-  opacity: 1;
-  transform: translateY(0);
+dialog.lightbox::backdrop { background: rgb(0 0 0 / .92); backdrop-filter: blur(6px); }
+dialog.lightbox[open] { display: grid; place-items: center; }
+dialog.lightbox img { max-width: min(92vw, 1400px); max-height: 82vh; object-fit: contain; }
+@media (prefers-reduced-motion: no-preference) {
+  dialog.lightbox img { animation: lb-in .32s cubic-bezier(.22,.61,.36,1) both; }
+  @keyframes lb-in { from { opacity: 0; transform: scale(.96) } to { opacity: 1; transform: none } }
 }
 ```
 
-**Step 2 — `Lightbox.astro` component:**
+**Component** (`src/components/Lightbox.astro`) — the starter ships this file; copy it rather than retyping:
 
 ```astro
 ---
-interface Props {
-  images: { src: string; alt: string }[];
-}
-const { images } = Astro.props;
-const imageData = JSON.stringify(images);
+interface Image { src: string; full?: string; alt: string; width: number; height: number }
+const { images } = Astro.props as { images: Image[] };
 ---
-<!--
-  Overlay is rendered in markup (not dynamically created by JS).
-  Default state: opacity:0, visibility:hidden.
-  JS toggles .active class to show/hide.
--->
-<div id="lightbox" class="lightbox-overlay fixed inset-0 z-50 bg-black/95 backdrop-blur-sm"
-     role="dialog" aria-modal="true" aria-label="Image gallery lightbox"
-     data-images={imageData}>
+<dialog id="lightbox" class="lightbox" aria-labelledby="lb-caption" aria-modal="true">
+  <img id="lb-img" src={images[0].full ?? images[0].src} alt="" width="1600" height="1200" />
+  <p id="lb-caption"></p>
+  <button type="button" data-lb-prev aria-label="Previous image">&#8592;</button>
+  <button type="button" data-lb-next aria-label="Next image">&#8594;</button>
+  <button type="button" data-lb-close aria-label="Close gallery">&#215;</button>
+</dialog>
 
-  <button id="lb-close"
-    class="absolute top-4 right-4 z-10 w-12 h-12 flex items-center justify-center
-           rounded-full bg-white/10 hover:bg-white/20 text-white transition
-           hover:scale-110 active:scale-95"
-    aria-label="Close lightbox">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-         stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round"
-         d="M6 18L18 6M6 6l12 12"/></svg>
-  </button>
+<script>
+  const dialog = document.getElementById('lightbox') as HTMLDialogElement;
+  const img = document.getElementById('lb-img') as HTMLImageElement;
+  const caption = document.getElementById('lb-caption')!;
+  const items = [...document.querySelectorAll<HTMLElement>('[data-lightbox]')];
+  let index = 0;
 
-  <div id="lb-counter"
-    class="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-full
-           bg-white/10 text-white text-sm font-medium backdrop-blur-md">
-    1 / {images.length}
-  </div>
+  const show = (i: number) => {
+    const item = items[(index = (i + items.length) % items.length)];
+    img.src = item.dataset.full || item.dataset.src || '';
+    img.alt = '';
+    caption.textContent = item.dataset.alt || '';
+  };
 
-  <div id="lb-caption"
-    class="lightbox-caption absolute bottom-24 left-1/2 -translate-x-1/2 z-10
-           max-w-2xl px-6 py-3 rounded-2xl bg-black/40 backdrop-blur-md text-white
-           text-sm text-center"></div>
-
-  <button id="lb-prev"
-    class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10
-           sm:w-12 sm:h-12 flex items-center justify-center rounded-full
-           bg-white/10 hover:bg-white/20 text-white transition hover:scale-110
-           active:scale-95"
-    aria-label="Previous image">
-    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor"
-         viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round"
-         stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-  </button>
-
-  <button id="lb-next"
-    class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10
-           sm:w-12 sm:h-12 flex items-center justify-center rounded-full
-           bg-white/10 hover:bg-white/20 text-white transition hover:scale-110
-           active:scale-95"
-    aria-label="Next image">
-    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor"
-         viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round"
-         stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-  </button>
-
-  <div id="lb-backdrop"
-    class="absolute inset-0 flex items-center justify-center p-4 sm:p-12 md:p-20
-           cursor-zoom-out">
-    <img id="lb-img" src="" alt=""
-         class="lightbox-image max-w-full max-h-full object-contain rounded-3xl
-                shadow-2xl cursor-default" />
-  </div>
-
-  {images.length > 1 && (
-    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2
-                max-w-[90vw] overflow-x-auto px-2 py-2 rounded-2xl bg-white/5
-                scrollbar-hide">
-      {images.map((img, i) => (
-        <button class="lb-thumb w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden
-                        flex-shrink-0 border-2 border-transparent
-                        hover:border-white/50 transition hover:scale-105"
-                data-index={i} aria-label={`Go to image ${i + 1}`}>
-          <img src={img.src} alt="" class="w-full h-full object-cover"
-               loading="lazy" decoding="async" />
-        </button>
-      ))}
-    </div>
-  )}
-</div>
-
-<script is:inline>
-  (function () {
-    const lightbox = document.getElementById('lightbox');
-    if (!lightbox) return;
-
-    let images = [];
-    try {
-      images = JSON.parse(lightbox.dataset.images || '[]');
-    } catch (e) { return; }
-
-    let currentIndex = 0;
-
-    const imgEl = document.getElementById('lb-img');
-    const captionEl = document.getElementById('lb-caption');
-    const counterEl = document.getElementById('lb-counter');
-    const thumbs = document.querySelectorAll('.lb-thumb');
-    const galleryItems = document.querySelectorAll('.js-gallery-item');
-
-    function update(index) {
-      if (!images.length) return;
-      currentIndex = (index + images.length) % images.length;
-      const image = images[currentIndex];
-      imgEl.src = image.src;
-      imgEl.alt = image.alt || '';
-      captionEl.textContent = image.alt || '';
-      if (counterEl) counterEl.textContent = `${currentIndex + 1} / ${images.length}`;
-      thumbs.forEach((t, i) => {
-        t.classList.toggle('border-white', i === currentIndex);
-        t.classList.toggle('border-transparent', i !== currentIndex);
-        t.classList.toggle('scale-110', i === currentIndex);
-      });
-    }
-
-    function open(index) {
-      update(index);
-      lightbox.classList.add('active');
-      document.body.style.overflow = 'hidden';
-      document.addEventListener('keydown', onKey);
-    }
-
-    function close() {
-      lightbox.classList.remove('active');
-      document.body.style.overflow = '';
-      document.removeEventListener('keydown', onKey);
-    }
-
-    function next() { update(currentIndex + 1); }
-    function prev() { update(currentIndex - 1); }
-
-    function onKey(e) {
-      if (e.key === 'Escape') close();
-      if (e.key === 'ArrowRight') next();
-      if (e.key === 'ArrowLeft') prev();
-    }
-
-    galleryItems.forEach((item, i) => {
-      item.addEventListener('click', () => open(i));
-      item.setAttribute('role', 'button');
-      item.setAttribute('tabindex', '0');
-      item.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(i); }
-      });
+  document.querySelectorAll<HTMLElement>('[data-lightbox]').forEach((item, i) => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      show(i);
+      dialog.showModal();
     });
+  });
 
-    thumbs.forEach((thumb) => {
-      thumb.addEventListener('click', () => {
-        update(parseInt(thumb.dataset.index, 10));
-      });
-    });
+  document.querySelector('[data-lb-next]')!.addEventListener('click', () => show(index + 1));
+  document.querySelector('[data-lb-prev]')!.addEventListener('click', () => show(index - 1));
+  document.querySelector('[data-lb-close]')!.addEventListener('click', () => dialog.close());
 
-    document.getElementById('lb-close').addEventListener('click', close);
-    document.getElementById('lb-next').addEventListener('click', next);
-    document.getElementById('lb-prev').addEventListener('click', prev);
-    document.getElementById('lb-backdrop').addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) close();
-    });
-  })();
+  // Click on the backdrop closes; a click on the image does not.
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+  // ESC is native. Focus returns to the opener automatically.
+
+  // Touch swipe: horizontal distance over 40px, or a downward drag to dismiss.
+  let startX = 0, startY = 0;
+  dialog.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+  }, { passive: true });
+  dialog.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dy) > 90 && dy > Math.abs(dx)) dialog.close();
+    else if (Math.abs(dx) > 40) show(index + (dx < 0 ? 1 : -1));
+  }, { passive: true });
 </script>
-
-<style>
-  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
-</style>
 ```
 
-**Step 3 — Gallery grid in the consuming page** (`gallery.astro`):
-
-Each gallery item needs `class="js-gallery-item"` and a `data-index` attribute so
-the lightbox JS can wire click events:
+**The grid calls it, nothing else does:**
 
 ```astro
----
-import { galleryImages } from '../data/content/gallery';
-import Lightbox from '../components/Lightbox.astro';
----
-<div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-  {galleryImages.map((img, i) => (
-    <div class="js-gallery-item group relative rounded-3xl overflow-hidden cursor-pointer"
-         data-index={i}>
-      <img src={img.src} alt={img.alt}
-           class="w-full h-64 sm:h-72 lg:h-80 object-cover
-                  group-hover:scale-105 transition-transform duration-500"
-           loading={i < 6 ? "eager" : "lazy"} decoding="async" />
-    </div>
-  ))}
-</div>
-
-<Lightbox images={galleryImages} />
+<button type="button" data-lightbox data-src={img.src} data-full={img.full}
+        data-alt={img.alt} aria-label={`Open image: ${img.alt}`}>
+  <img src={img.src} alt={img.alt} width={img.width} height={img.height} loading="lazy" decoding="async" />
+</button>
 ```
+Render `<Lightbox images={gallery} />` once per page; the inline script above is a module, so it runs
+after the markup exists. One `id="lightbox"` per page — two galleries, one dialog, both lists merged into
+`images`.
 
-**What makes this work — summary of the three critical decisions:**
+**Rules that break it**
 
-| Decision | Why it matters |
-|---|---|
-| Overlay rendered in markup, not created by JS | DOM is ready at page load; no timing issues |
-| Visibility/opacity styles in `global.css` | Astro doesn't scope them — they always match |
-| JS uses `is:inline` directive | Raw DOM access without build-step interference |
+- The opener must be a `<button>` carrying `data-lightbox` (plus `data-index` for order), not a `<div>` or
+  an `<a href="#">` — the verify gate clicks `[data-lightbox]`, and a non-button leaves keyboard users with
+  nothing. One attribute name for every gallery on the site.
+- Give the `<img>` a real initial `src` (the first gallery image, not `""`); an empty `src` resolves to the
+  page URL and shows up as a broken request in every probe.
+- `width`/`height` on the dialog `<img>` are the reserved box, not the final size — without them the dialog
+  jumps on open and CLS pays for it.
+- Keep the `<dialog>` in the component that renders it. Do **not** append it to `document.body` from JS:
+  Astro's scoped styles stop matching and the overlay renders invisible (§7.1).
+- Images above the fold in the grid are `loading="eager"`; everything inside the dialog is lazy — nobody
+  opens a gallery before scrolling.
+
+---
 
 ### 7.7 Mobile menu pattern (vanilla)
 
@@ -1143,21 +1005,18 @@ Never inline arbitrary JSON-LD by hand — generators keep NAP consistent.
 
 ### 7.12 Placeholder images & Unsplash stock (build-then-replace workflow)
 
-**Goal:** a project must build with a correct layout *before* any real photos exist.
-The agent never blocks on missing images and never ships broken layout to make up
-for them. Two-tier strategy:
+**Goal:** a project must build with a correct layout *before* any real photos exist. The agent never
+blocks on missing images and never ships a broken layout to make up for them.
 
 #### Tier 1 — Grey SVG placeholder (default, zero-dependency)
-Always scaffold with these first so the build passes immediately and layout is real.
+
 - Ship `public/images/placeholder.svg` once:
   ```xml
   <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9' preserveAspectRatio='xMidYMid slice'>
     <rect width='16' height='9' fill='%23e5e7eb'/>
   </svg>
   ```
-  (decode `%23` as `#` if writing the file directly — keep `#` encoded only inside data URIs)
-- For per-slot sizing without shipping one SVG per aspect, prefer an inline data URI in
-  the `src/utils/placeholder.ts` helper:
+- For per-slot sizing, use an inline data URI from `src/utils/placeholder.ts` instead of one SVG per aspect:
   ```ts
   export const placeholder = (w = 1600, h = 900, label = '') => {
     const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>
@@ -1168,124 +1027,35 @@ Always scaffold with these first so the build passes immediately and layout is r
     return `data:image/svg+xml,${encodeURIComponent(svg)}`;
   };
   ```
-- Components reference it via a single convention, so real images just slot in later:
-  ```astro
-  ---
-  import { placeholder } from '../utils/placeholder';
-  const src = img?.src ?? placeholder(1600, 900, 'Hero image');
-  const alt = img?.alt ?? 'Placeholder — replace before launch';
-  ---
-  <img src={src} alt={alt} width={img?.w ?? 1600} height={img?.h ?? 900}
-       loading="lazy" decoding="async" class="…" />
-  ```
-- The placeholder helper guarantees `width`/`height` are always present → zero CLS
-  now and after the real image is dropped in (use the same aspect ratio).
-- **Mark every placeholder** in `POST-SETUP.md` via the `placeholder` flag in
-  `gallery.ts` (see §6). The build/verify gate (§10) should grep `placeholder: true`
-  and remind the user of pending replacements.
+- The helper guarantees `width`/`height` on every placeholder → zero CLS now and after the real image
+  lands. Keep the same aspect ratio when replacing.
+- Mark every placeholder with the `placeholder: true` flag in the data file (§6) and list it in
+  `POST-SETUP.md`. The gate greps for it (§10).
 
-#### Tier 2 — Unsplash contextual stock (when key provided)
-If the user gave `UNSPLASH_ACCESS_KEY` in §1 Phase D, fetch contextual photos so the
-site looks real to stakeholders before the brand shoot lands.
+#### Tier 2 — Unsplash stock (only when the client supplies a key)
 
-- **Auth + env:** store key in `.env` (gitignored); load via `process.env` in the
-  fetch script. `.env.example` ships:
-  ```env
-  UNSPLASH_ACCESS_KEY=your_key_here
-  ```
-- **Rate limit awareness:** demo apps = 50 requests/hour, production = 1000/hour
-  after approval. **Cache aggressively** — one search query → save JSON results to
-  `content/images/.unsplash-cache.json`, never re-fetch the same query. Image-file
-  requests to `images.unsplash.com` do NOT count against the rate limit.
-- **Hotlinking is required by Unsplash ToS** — do NOT download the binary. Components
-  use the returned `urls.raw` URL directly (CDN-served). Append `&w=…&q=80&fit=crop`
-  for sizing; never strip the `ixid` parameter (it powers view tracking).
-- **Attribution is mandatory** — every Unsplash image must carry a credit. Store it
-  in `gallery.ts` and render it in the lightbox caption or footer credits:
-  ```ts
-  // gallery.ts entry shape
-  { src: '/images/…webp', unsplashRaw: 'https://images.unsplash.com/…?ixid=…',
-    alt: 'Skiathos harbour at sunset', placeholder: false,
-    credit: { name: 'Marina Cavalli', url: 'https://unsplash.com/@marinacavalli' } }
-  ```
-  Render: `Photo by <a href={credit.url} rel="nofollow noopener">{credit.name}</a> on <a href="https://unsplash.com" rel="nofollow noopener">Unsplash</a>`
-- **Reference fetch script** (`scripts/fetch-unsplash.mjs`):
-  ```js
-  import fs from 'node:fs/promises';
-  import path from 'node:path';
+Stock exists so the owner can see the layout with real-looking photos before the brand shoot. It never
+replaces the client's own images, and it is not a launch plan.
 
-  const KEY = process.env.UNSPLASH_ACCESS_KEY;
-  if (!KEY) { console.error('Missing UNSPLASH_ACCESS_KEY — add to .env'); process.exit(1); }
+- Key lives in `.env` as `UNSPLASH_ACCESS_KEY` (gitignored); `.env.example` ships the empty key.
+- **The script is in the starter: `scripts/fetch-unsplash.mjs`.** Run
+  `npm run fetch-images -- "skiathos beach" "taverna interior"`, or copy the file into a project that
+  predates it. It caches per query in `content/images/.unsplash-cache.json`, so re-runs cost nothing.
+- **Hotlinking is required by the Unsplash terms** — use the returned `urls.raw` URL, append
+  `&w=…&q=80&fit=crop`, never strip `ixid`. Do not download the binary.
+- **Attribution is mandatory**: keep the `credit` field and render it (visible or `sr-only` linking to the
+  photographer). Remove it only when the photo is replaced by the client's own.
+- Rate limits: 50 requests/hour on a demo app, 1000 after approval. One query per section, five max.
+- Translating sections into queries is the agent's job (`rooms` → "boutique hotel room sea view",
+  `menu` → "greek taverna food") — never a generic "business" search.
 
-  const queries = process.argv.slice(2);
-  if (!queries.length) { console.error('Usage: npm run fetch-images -- "query1" "query2" …'); process.exit(1); }
+#### Swapping in the real photos
 
-  const cacheFile = 'content/images/.unsplash-cache.json';
-  let cache = {};
-  try { cache = JSON.parse(await fs.readFile(cacheFile, 'utf8')); } catch {}
+`npm run images -- Images/` (§7.11) rewrites the data entries in place, clears `placeholder`, keeps a
+`credit` only if the slot is still stock. `POST-SETUP.md` keeps "swap stock for brand photos" as the last
+line item until the owner confirms.
 
-  const outDir = 'content/images';
-  await fs.mkdir(outDir, { recursive: true });
-
-  const results = [];
-  for (const q of queries) {
-    if (cache[q]) { results.push(...cache[q]); continue; }   // never re-fetch
-    const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(q)}&per_page=12&orientation=landscape&content_filter=high`;
-    const res = await fetch(url, { headers: { Authorization: `Client-ID ${KEY}` }});
-    if (!res.ok) { console.error(`Unsplash ${res.status} for "${q}"`); continue; }
-    const { results: photos } = await res.json();
-    const mapped = photos.map(p => ({
-      id: p.id,
-      raw: p.urls.raw,                  // hotlink — keep ixid intact
-      alt: p.alt_description || `${q} photo`,
-      credit: { name: p.user.name, url: p.user.links.html },
-      blur_hash: p.blur_hash,
-      width: p.width, height: p.height,
-    }));
-    cache[q] = mapped; results.push(...mapped);
-    await new Promise(r => setTimeout(r, 1000));              // be polite to the API
-  }
-  await fs.writeFile(cacheFile, JSON.stringify(cache, null, 2));
-  await fs.writeFile(path.join(outDir, 'unsplash-manifest.json'),
-    JSON.stringify(results, null, 2));
-  console.log(`Fetched ${results.length} images for: ${queries.join(', ')}`);
-  console.log(`Manifest: ${outDir}/unsplash-manifest.json  (cache: ${cacheFile})`);
-  ```
-- **Wire into package.json:** `"fetch-images": "node scripts/fetch-unsplash.mjs"`
-- **Brief-derived queries:** the agent should translate the project's sections into
-  Unsplash search queries, e.g. for a ski resort: `["ski slope", "chalet interior",
-  "mountain restaurant", "spa wellness", "gondola lift"]`. One query per section +
-  one generic per service category is usually enough; cap at ~5 queries/hr to stay
-  well under demo limit.
-- **Keep `placeholder: true` flag off** once an Unsplash image is wired in — but keep
-  the `credit` field so attribution survives into production.
-- **Replaces but doesn't override** user-provided images: if `Images/` folder exists
-  and contains real photos, those win — Unsplash only fills empty slots.
-
-#### Component integration
-A `Picture.astro` (or similar) helper keeps both tiers consistent:
-```astro
 ---
-import { placeholder } from '../utils/placeholder';
-const { img, w, h, label, sizes } = Astro.props;
-const src = img?.src ?? placeholder(w, h, label);
-const srcset = img?.variants ? img.variants.map(v => `${v.src} ${v.w}w`).join(', ') : undefined;
----
-<picture>
-  {img?.credit && <small class="sr-only">Photo by {img.credit.name} on Unsplash</small>}
-  <img src={src} srcset={srcset} sizes={sizes}
-       alt={img?.alt ?? 'Placeholder — replace before launch'}
-       width={w} height={h} loading="lazy" decoding="async" class="…" />
-</picture>
-```
-
-#### When user's real images arrive later
-User drops photos into `Images/` → runs `npm run images -- Images/` (§7.11) →
-`process-images.mjs` overwrites the `gallery.ts` entries in place, clears the
-`placeholder` flag, and keeps any existing `credit` field if the slot was Unsplash
-(strips it if the new image is a real photo, since attribution no longer applies).
-POST-SETUP.md should still list "swap placeholders for brand photos" as the final
-quality gate.
 
 ### 7.13 Reference-link scraping (auto-extract business facts)
 

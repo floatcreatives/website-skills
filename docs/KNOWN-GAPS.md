@@ -76,36 +76,28 @@ clean.
 
 ## 7. `starter/` carries most of the §0.5 kit, not all of it
 
-§0.5 (added 2026-11-16) makes these mandatory on every build, and the starter still ships none of them:
+**Closed in 1.3.0/1.3.1:** `public/_headers` with the §18 set, `max-image-preview:large`, a two-value
+`theme-color` + `color-scheme`, `fetchpriority="high"` and dimensions on the hero, dimensions on every other
+`<img>` including the gallery data type, font metric overrides, `text-wrap` defaults, the `overflow-x: hidden`
+hack removed, a working native-`<dialog>` lightbox (it previously had **no JavaScript** — markup, styling and
+openers, and nothing that opened it), `scripts/check-platform.mjs`, `scripts/fetch-unsplash.mjs`.
 
-- **No `src/i18n/` scaffold.** §0.5.4 wants a typed dictionary with `en.ts` stubbed against `Dict`, so a
-  second language is one file. Every project currently invents its own shape, which is how the seam gets
-  skipped.
-- **No `scripts/check-third-party.mjs`.** §0.5.5 claims "no cookies, no banner" and that claim is only
-  gated if the checker runs in `npm run build`. The script exists in the Hermes skill
-  (`float-website-skills`) and needs to move here as the canonical copy.
-- **No `public/robots.txt`** with a sitemap line, and `sitemap()` is called without the `i18n` block that
-  §0.5.4 requires once a second locale exists.
-- **No skip link / `<main id="main">`** and no `scroll-margin-top` on anchor targets (§0.5.3).
-
-**Shipped in 1.3.0** (this gap is now partial): `public/_headers` with the §18 set, `max-image-preview:large`,
-a two-value `theme-color` + `color-scheme`, `fetchpriority="high"` + dimensions on the hero, dimensions on
-every other `<img>` including the gallery data type, font metric overrides, `text-wrap` defaults, the
-`overflow-x: hidden` hack removed, `scripts/check-platform.mjs` gating all of it on `dist/`.
-
-Still missing, and still the reason this gap stays open:
+**Still open:**
 
 - **No `src/i18n/` scaffold.** §0.5.4 wants a typed dictionary with the default language stubbed against
-  `Dict`, so a second language is one file. `SITE.alternateLocales` exists and `hreflang` follows it, but
-  the copy is still embedded in `site.config.ts` and `src/data/content/*`.
-- **No `scripts/check-third-party.mjs`.** §0.5.5 claims "no cookies, no banner" and that claim is only
-  gated if the checker runs in `npm run build`. The script exists in the Hermes skill
-  (`float-website-skills`) and needs to move here as the canonical copy.
+  `Dict`, so a second language is one file. `SITE.alternateLocales` exists and `hreflang` follows it, but the
+  copy is still embedded in `site.config.ts` and `src/data/content/*`.
+- **No `scripts/check-third-party.mjs`.** §0.5.5 claims "no cookies, no banner" and that claim is only gated
+  if the checker runs in `npm run build`. The script exists in the Hermes skill (`float-website-skills`) and
+  needs to move here as the canonical copy.
 - **No interaction-loaded map facade.** The contact map is a live Google iframe with `loading="lazy"`;
   §0.5.5 wants a click-to-load facade so nothing third-party loads before consent.
+- **Unsplash is a script, not a workflow.** `npm run fetch-images` works, but the `credit` field is only
+  rendered by components that opt in, and nothing enforces attribution at build time.
 
-Decision needed: fold the i18n scaffold and the facade into the starter (one commit, then re-verify the
+Decision needed: fold the i18n scaffold and the map facade into the starter (one commit, then re-verify the
 build), or leave the rules ahead of the starter and say so here until someone does.
+
 ## 8. Every shipped site predates the 1.3.0 conformance rules
 
 Measured 2026-11-21 across the 17 built client repos: **0/17** serve a real security-header policy

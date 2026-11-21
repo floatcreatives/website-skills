@@ -12,6 +12,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "check:platform": "node scripts/check-platform.mjs",
+    "fetch-images": "node scripts/fetch-unsplash.mjs",
     "astro": "astro"
   },
   "dependencies": {
