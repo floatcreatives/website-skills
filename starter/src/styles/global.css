@@ -371,32 +371,38 @@ h1, h2, h3 {
     transition: transform 0.15s ease;
   }
 
-  .lightbox-overlay {
-    transition: opacity 0.35s ease, visibility 0.35s ease;
-    opacity: 0;
-    visibility: hidden;
+  /* Lightbox — native <dialog>. No JS class toggling, no visibility hack: [open] is the state. */
+  dialog.lightbox-overlay {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    max-width: none;
+    max-height: none;
+    width: 100dvw;
+    height: 100dvh;
+    background: rgb(9 9 11 / .95);
+    color: #fff;
+    overflow: hidden;
   }
-  .lightbox-overlay.active {
-    opacity: 1;
-    visibility: visible;
+  dialog.lightbox-overlay::backdrop {
+    background: rgb(9 9 11 / .8);
+    backdrop-filter: blur(6px);
   }
-  .lightbox-image {
-    transition: opacity 0.35s ease, transform 0.35s ease;
-    opacity: 0;
-    transform: scale(0.92);
-  }
-  .lightbox-overlay.active .lightbox-image {
-    opacity: 1;
-    transform: scale(1);
-  }
-  .lightbox-caption {
-    transition: opacity 0.4s ease 0.1s, transform 0.4s ease 0.1s;
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  .lightbox-overlay.active .lightbox-caption {
-    opacity: 1;
-    transform: translateY(0);
+  @media (prefers-reduced-motion: no-preference) {
+    dialog.lightbox-overlay[open] .lightbox-image {
+      animation: lb-in .32s cubic-bezier(.22,.61,.36,1) both;
+    }
+    dialog.lightbox-overlay[open] .lightbox-caption {
+      animation: lb-caption-in .4s cubic-bezier(.22,.61,.36,1) both;
+    }
+    @keyframes lb-in {
+      from { opacity: 0; transform: scale(.96); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes lb-caption-in {
+      from { opacity: 0; transform: translate(-50%, 10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
   }
 
   .magnify-ring {

@@ -29,13 +29,12 @@ const { badge, heading, description, cta } = galleryPageContent;
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-3 sm:mb-4" id="gallery-grid">
-        <div data-motion style="--motion-delay:0ms" class="js-gallery-item tilt-card hover-lift group relative rounded-3xl overflow-hidden aspect-[4/5] sm:aspect-[3/4] md:aspect-auto cursor-pointer transition-transform duration-300">
+        <button type="button" data-lightbox data-motion data-index="0" aria-label={`Open image: ${images[0].alt}`} style="--motion-delay:0ms" class="js-gallery-item tilt-card hover-lift group relative rounded-3xl overflow-hidden aspect-[4/5] sm:aspect-[3/4] md:aspect-auto cursor-pointer transition-transform duration-300 w-full">
           <img
             src={images[0].src}
             alt={images[0].alt}
             width={images[0].width}
             height={images[0].height}
-            data-index="0"
             class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="eager"
             decoding="async"
@@ -46,16 +45,15 @@ const { badge, heading, description, cta } = galleryPageContent;
           <div class="magnify-ring absolute bottom-4 right-4 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg pointer-events-none">
             <svg class="w-5 h-5 text-neutral-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
           </div>
-        </div>
+        </button>
         <div class="grid grid-cols-2 gap-3 sm:gap-4">
           {images.slice(1, 5).map((img, i) => (
-            <div data-motion style={`--motion-delay:${(i + 1) * 80}ms`} class="js-gallery-item tilt-card hover-lift group relative rounded-3xl overflow-hidden aspect-square cursor-pointer transition-transform duration-300">
+            <button type="button" data-lightbox data-motion data-index={i + 1} aria-label={`Open image: ${img.alt}`} style={`--motion-delay:${(i + 1) * 80}ms`} class="js-gallery-item tilt-card hover-lift group relative rounded-3xl overflow-hidden aspect-square cursor-pointer transition-transform duration-300 w-full">
               <img
                 src={img.src}
                 alt={img.alt}
                 width={img.width}
                 height={img.height}
-                data-index={i + 1}
                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
@@ -65,7 +63,7 @@ const { badge, heading, description, cta } = galleryPageContent;
               <div class="magnify-ring absolute bottom-3 right-3 w-9 h-9 bg-white/90 backdrop-blur rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg pointer-events-none">
                 <svg class="w-4 h-4 text-neutral-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

@@ -1,52 +1,118 @@
 ---
 export interface Props {
-  images: { src: string; alt: string }[];
+  images: { src: string; alt: string; full?: string; width?: number; height?: number }[];
 }
 const { images } = Astro.props;
 ---
 
-<!-- Lightbox Overlay -->
-<div id="lightbox" class="lightbox-overlay fixed inset-0 z-50 bg-neutral-950/95 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Image gallery lightbox">
-  <!-- Close button -->
-  <button id="lb-close" class="absolute top-4 right-4 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-110 active:scale-95" aria-label="Close lightbox">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+<!-- Native <dialog>: focus trap, inert background, top layer, ESC and focus return for free.
+     A <div role="dialog"> would need all five reimplemented (rules §7.6, §9.5). -->
+<dialog id="lightbox" class="lightbox-overlay" aria-label="Image gallery">
+  <button id="lb-close" type="button" class="absolute top-4 right-4 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-110 active:scale-95" aria-label="Close gallery">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
   </button>
 
-  <!-- Counter -->
-  <div id="lb-counter" class="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium backdrop-blur-md">
+  <div id="lb-counter" class="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium backdrop-blur-md" aria-hidden="true">
     1 / {images.length}
   </div>
 
-  <!-- Caption -->
-  <div id="lb-caption" class="lightbox-caption absolute bottom-24 left-1/2 -translate-x-1/2 z-10 max-w-2xl px-6 py-3 rounded-2xl bg-black/40 backdrop-blur-md text-white text-sm text-center">
-    Image caption
-  </div>
+  <div id="lb-caption" class="lightbox-caption absolute bottom-24 left-1/2 -translate-x-1/2 z-10 max-w-2xl px-6 py-3 rounded-2xl bg-black/40 backdrop-blur-md text-white text-sm text-center"></div>
 
-  <!-- Prev button -->
-  <button id="lb-prev" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-110 active:scale-95" aria-label="Previous image">
-    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+  <button id="lb-prev" type="button" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-110 active:scale-95" aria-label="Previous image">
+    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
   </button>
 
-  <!-- Next button -->
-  <button id="lb-next" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-110 active:scale-95" aria-label="Next image">
-    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+  <button id="lb-next" type="button" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all hover:scale-110 active:scale-95" aria-label="Next image">
+    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
   </button>
 
-  <!-- Image container -->
-  <div class="absolute inset-0 flex items-center justify-center p-4 sm:p-12 md:p-20">
-    <!-- src is set by JS on open — an empty src here is intentional, not a broken asset (§7.14 override) -->
-    <img id="lb-img" src="" alt="" width="1600" height="1200" data-impeccable-ignore="broken-image" class="lightbox-image max-w-full max-h-full object-contain rounded-3xl shadow-2xl" />
+  <div class="absolute inset-0 flex items-center justify-center p-4 sm:p-12 md:p-20 pointer-events-none">
+    <img
+      id="lb-img"
+      src={images[0].full ?? images[0].src}
+      alt=""
+      width={images[0].width ?? 1600}
+      height={images[0].height ?? 1200}
+      class="lightbox-image max-w-full max-h-full object-contain rounded-3xl shadow-2xl pointer-events-auto"
+    />
   </div>
 
-  <!-- Thumbnail strip -->
-  <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 max-w-[90vw] overflow-x-auto px-2 py-2 rounded-2xl bg-white/5 scrollbar-hide">
+  <div id="lb-thumbs" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2 max-w-[90vw] overflow-x-auto px-2 py-2 rounded-2xl bg-white/5 scrollbar-hide">
     {images.map((img, i) => (
-      <button class="lb-thumb w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden flex-shrink-0 border-2 border-transparent hover:border-white/50 transition-all hover:scale-105" data-index={i} aria-label={`Go to image ${i + 1}`}>
+      <button type="button" class="lb-thumb w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden flex-shrink-0 border-2 border-transparent hover:border-white/50 transition-all hover:scale-105" data-thumb={i} aria-label={`Go to image ${i + 1}`}>
         <img src={img.src} alt="" width="56" height="56" class="w-full h-full object-cover" loading="lazy" decoding="async" />
       </button>
     ))}
   </div>
-</div>
+</dialog>
+
+<script>
+  const dialog = document.getElementById('lightbox') as HTMLDialogElement | null;
+  if (dialog) {
+    const img = document.getElementById('lb-img') as HTMLImageElement;
+    const caption = document.getElementById('lb-caption') as HTMLElement;
+    const counter = document.getElementById('lb-counter') as HTMLElement;
+    const thumbs = [...dialog.querySelectorAll<HTMLElement>('[data-thumb]')];
+    const openers = [...document.querySelectorAll<HTMLElement>('[data-lightbox]')];
+    let index = 0;
+
+    const show = (next: number) => {
+      if (!openers.length) return;
+      index = (next + openers.length) % openers.length;
+      const opener = openers[index];
+      const source = opener.querySelector('img');
+      img.src = opener.dataset.full || source?.currentSrc || source?.src || '';
+      img.alt = '';
+      const alt = source?.alt || '';
+      caption.textContent = alt;
+      caption.style.display = alt ? '' : 'none';
+      counter.textContent = `${index + 1} / ${openers.length}`;
+    };
+
+    openers.forEach((opener, i) => {
+      opener.addEventListener('click', () => {
+        show(i);
+        dialog.showModal();
+      });
+      opener.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          show(i);
+          dialog.showModal();
+        }
+      });
+    });
+
+    document.getElementById('lb-next')?.addEventListener('click', () => show(index + 1));
+    document.getElementById('lb-prev')?.addEventListener('click', () => show(index - 1));
+    document.getElementById('lb-close')?.addEventListener('click', () => dialog.close());
+    thumbs.forEach((thumb) => thumb.addEventListener('click', () => show(Number(thumb.dataset.thumb))));
+
+    // Backdrop click closes; a click on the image does not.
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+
+    // Arrow keys while open; ESC is native.
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') show(index + 1);
+      if (e.key === 'ArrowLeft') show(index - 1);
+    });
+
+    let startX = 0;
+    let startY = 0;
+    dialog.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    dialog.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      if (Math.abs(dy) > 90 && dy > Math.abs(dx)) dialog.close();
+      else if (Math.abs(dx) > 40) show(index + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+  }
+</script>
 
 <style>
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
