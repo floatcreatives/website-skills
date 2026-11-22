@@ -14,10 +14,10 @@ source.
 | Path | What it is | Who reads it |
 |---|---|---|
 | `BROCHURE-SITE-RULES.md` | **The contract.** Every rule, pattern and gate for building a brochure site. Source of truth. | Agents read it first, always |
-| `VERSION` | The rules revision (`1.3.1`). Every local agent skill must carry the same `version:` — one name, one number. | Everyone, before trusting a local copy |
+| `VERSION` | The rules revision (`1.3.2`). Every local agent skill must carry the same `version:` — one name, one number. | Everyone, before trusting a local copy |
 | `CLIENT-BRIEF.md` | Fill-in brief. Copy into a new project, fill it, hand to the agent. | You, before building |
 | `starter/` | Working Astro 7 + Tailwind v4 starter. 7 pages, 15 components, SEO/schema, sitemap. Build-verified. | Copy to start a project |
-| `repo-template/` | Files every new project repo carries: `AGENTS.md`, `.gitignore`, `.env.example`, `SETUP-CHECKLIST.md` | Copy into the project |
+| `repo-template/` | Files every new project repo carries: `AGENTS.md`, `.gitignore`, `.env.example`, `SETUP-CHECKLIST.md`, `dependabot.yml` (weekly grouped security PRs, monthly majors) | Copy into the project |
 | `agents/` | `AGENTS.md` / `CLAUDE.md` / `.cursorrules` — make any AI agent load the rules automatically | Copy into the project |
 | `docs/` | Known gaps, proposed updates, change history, `I18N-AND-PRIVACY.md` (bilingual seam + GDPR floor, §0.5.4/§0.5.5), `WEB-PLATFORM.md` (the Google-derived conformance checklist behind §9 and §9.7) and `RETROFITTING.md` (bringing an older site up to the current rules) | Read when something looks off |
 
