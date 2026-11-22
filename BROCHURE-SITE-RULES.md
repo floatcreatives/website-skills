@@ -338,6 +338,10 @@ This file intentionally pins **no dependency versions**, so it cannot go stale. 
    - `npm outdated` — every line is a decision, not background noise: *upgrade now*, or *parked until `<blocker>`* written in `POST-SETUP.md`. A major that has been available for a quarter without a note is a stale site, and stale is how a 9.8 arrives.
 7. **Do not park a major on a whim.** `@astrojs/check` blocking TypeScript 7 is a real blocker and is documented above; "it might break something" is not. Upgrade on a branch, run the build and the browser smoke test, read the migration note when the build complains.
 8. **Automate the watching, not the remembering:** every repo carries `.github/dependabot.yml` (copied from `repo-template/`) — grouped security updates weekly, majors monthly. Nobody catches a CVE by re-reading a rule file.
+9. **A major upgrade is a branch, a build, and a browser run — in that order.** Bump the dependency, rebuild before touching anything else, and fix only what the compiler names. Two breakages that are not obvious from the changelog and cost a cycle each:
+   - **Astro 6 → 7:** an HTML comment inside a JSX expression (`{cond ? ( <!-- note --> <div> … )}`) is a `CompilerError: Unexpected token`. Delete the comment; it cannot be moved inside the expression.
+   - **`astro-icon` warns on every build when `src/icons/` is missing** (`ENOENT: scandir`). The gate counts warnings as failures — `mkdir -p src/icons && touch src/icons/.gitkeep`.
+   Anything that needs a design decision rather than a signature fix stops the upgrade and goes back to the owner. A site on an old major is a debt; a half-migrated site is an outage.
 
 ### 3. Extendable — but with justification
 
