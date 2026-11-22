@@ -341,6 +341,10 @@ This file intentionally pins **no dependency versions**, so it cannot go stale. 
 9. **A major upgrade is a branch, a build, and a browser run — in that order.** Bump the dependency, rebuild before touching anything else, and fix only what the compiler names. Two breakages that are not obvious from the changelog and cost a cycle each:
    - **Astro 6 → 7:** an HTML comment inside a JSX expression (`{cond ? ( <!-- note --> <div> … )}`) is a `CompilerError: Unexpected token`. Delete the comment; it cannot be moved inside the expression.
    - **`astro-icon` warns on every build when `src/icons/` is missing** (`ENOENT: scandir`). The gate counts warnings as failures — `mkdir -p src/icons && touch src/icons/.gitkeep`.
+   - **Astro 7 strips whitespace-only text nodes between elements**, so inline text glues together (`στηναγάπη`, `€€· €€`) with no error. Fix with an explicit `{' '}` at the seam, and diff the rendered `innerText` of the old and new builds across every route — a build that compiles is not a page that reads correctly.
+   - **`define:vars` no longer works on `<script>`** (it stays for `<style>`). Server values reach the script as JSON on the tag: `<script is:inline data-vars={JSON.stringify(data)}>` + `JSON.parse(document.currentScript.dataset.vars)`.
+   - **Invalid nesting no longer fails loudly in the other direction:** an extra `</div>` closes a component root early and Astro 7 then silently drops the rest of the file — a whole contact form with no error. Click the interactive parts on the preview build; the build will not tell you.
+   - **Upgrade in the order: package.json → install → build → click.** Every one of these took longer to find by reading than by building.
    Anything that needs a design decision rather than a signature fix stops the upgrade and goes back to the owner. A site on an old major is a debt; a half-migrated site is an outage.
 
 ### 3. Extendable — but with justification
