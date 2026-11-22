@@ -16,10 +16,10 @@
 
 ## 0. What this file is
 
-> **VERSION: 1.3.1** — bump this number with every change to these rules, and bump the local
+> **VERSION: 1.3.2** — bump this number with every change to these rules, and bump the local
 > agent skill `float-website-skills` (`version:` in its frontmatter) to the same number in the same
-> change. One name, one version: `float-website-skills` v1.3.1 == `BROCHURE-SITE-RULES.md`
-> 1.3.1. The root `VERSION` file carries the same string.
+> change. One name, one version: `float-website-skills` v1.3.2 == `BROCHURE-SITE-RULES.md`
+> 1.3.2. The root `VERSION` file carries the same string.
 
 A portable contract for building **static brochure websites** (Astro + Tailwind CSS v4).
 Target projects: local businesses, restaurants, clinics, shops, villas, studios,
@@ -333,6 +333,15 @@ This file intentionally pins **no dependency versions**, so it cannot go stale. 
 3. **Newer major wins:** if a package's latest is a higher major than the stack table implies, use the new major and read its migration notes if `npm run build` complains.
 4. **TypeScript stays on the newest 6.x** while `@astrojs/check` declares `typescript@^5.0.0 || ^6.0.0`; do not jump to 7.x until `@astrojs/check` supports it.
 5. **Keep the starter templates current too:** when a dependency releases a new major, upgrade it in the base template and re-run `npm run build` + a dev-server smoke test **before** scaffolding new client projects from it. A stale template is a stale project.
+6. **A site is not "done" when it ships — it is done when its dependencies are current.** Scaffold-time freshness is not enough: the scanner on a client's host reads `package-lock.json` and mails the owner about every advisory it finds, whether or not the vulnerable code path can run on a static host. Two standing checks, run at hand-off and on every revisit:
+   - `npm audit --audit-level=high` — **zero** high/critical, no exceptions, no explanation. A security fix lands immediately, whatever the major.
+   - `npm outdated` — every line is a decision, not background noise: *upgrade now*, or *parked until `<blocker>`* written in `POST-SETUP.md`. A major that has been available for a quarter without a note is a stale site, and stale is how a 9.8 arrives.
+7. **Do not park a major on a whim.** `@astrojs/check` blocking TypeScript 7 is a real blocker and is documented above; "it might break something" is not. Upgrade on a branch, run the build and the browser smoke test, read the migration note when the build complains.
+8. **Automate the watching, not the remembering:** every repo carries `.github/dependabot.yml` (copied from `repo-template/`) — grouped security updates weekly, majors monthly. Nobody catches a CVE by re-reading a rule file.
+9. **A major upgrade is a branch, a build, and a browser run — in that order.** Bump the dependency, rebuild before touching anything else, and fix only what the compiler names. Two breakages that are not obvious from the changelog and cost a cycle each:
+   - **Astro 6 → 7:** an HTML comment inside a JSX expression (`{cond ? ( <!-- note --> <div> … )}`) is a `CompilerError: Unexpected token`. Delete the comment; it cannot be moved inside the expression.
+   - **`astro-icon` warns on every build when `src/icons/` is missing** (`ENOENT: scandir`). The gate counts warnings as failures — `mkdir -p src/icons && touch src/icons/.gitkeep`.
+   Anything that needs a design decision rather than a signature fix stops the upgrade and goes back to the owner. A site on an old major is a debt; a half-migrated site is an outage.
 
 ### 3. Extendable — but with justification
 

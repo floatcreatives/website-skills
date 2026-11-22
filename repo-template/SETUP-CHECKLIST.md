@@ -24,6 +24,7 @@ cp float-devops/repo-template/.gitignore    <project>/
 cp float-devops/repo-template/.env.example  <project>/
 cp float-devops/repo-template/AGENTS.md     <project>/
 cp float-devops/repo-template/README.md     <project>/
+cp float-devops/repo-template/dependabot.yml .github/
 ```
 
 `.gitignore` must exist **before** anything is committed. Adding it later leaves
