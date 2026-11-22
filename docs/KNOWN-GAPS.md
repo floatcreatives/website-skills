@@ -98,12 +98,8 @@ openers, and nothing that opened it), `scripts/check-platform.mjs`, `scripts/fet
 Decision needed: fold the i18n scaffold and the map facade into the starter (one commit, then re-verify the
 build), or leave the rules ahead of the starter and say so here until someone does.
 
-## 8. Every shipped site predates the 1.3.0 conformance rules
+## 8. Sites built before 1.3.x carry the conformance debt
 
-Measured 2026-11-21 across the 17 built client repos: **0/17** serve a real security-header policy
-(no CSP, no HSTS), **0/17** survive forced-colours mode, 11/17 lack `autocomplete` tokens on form fields,
-11/17 lack `max-image-preview:large`, 12/17 still build their overlay as `<div role="dialog">`, 2/17 have
-no `fetchpriority` on any image. The starter carries the fixes from now on; the existing sites do not.
-
-Retrofit plan, batches and per-site matrix: `docs/RETROFIT-2026-11.md`. This gap closes when that plan has
-run, not when the rules change.
+No vintage site serves the §18 header set, and most miss `max-image-preview`, `color-scheme`, a skip link,
+`autocomplete` tokens and image dimensions. The rules fix this for new builds; older ones need the retrofit
+pass described in `RETROFITTING.md`. Progress is tracked privately, not in this repo.
